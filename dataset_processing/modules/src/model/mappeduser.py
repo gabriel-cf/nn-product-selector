@@ -1,3 +1,6 @@
+import os, sys
+sys.path.append(os.path.join('..', 'mapper'))
+
 from datetime import date, datetime
 from mapper import Mapper
 

@@ -1,3 +1,6 @@
+import os, sys
+sys.path.append(os.path.join('..', 'mapper'))
+
 import mapper
 from mapper import Mapper
 

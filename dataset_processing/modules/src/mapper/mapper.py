@@ -1,3 +1,5 @@
+import os, sys
+sys.path.append(os.path.join('..', 'util'))
 import json
 from utils import eprint # Print to STDERR
 

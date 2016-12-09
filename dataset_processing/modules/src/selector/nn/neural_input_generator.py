@@ -1,10 +1,14 @@
 #!/usr/bin/python2.7
+
+import os, sys
+sys.path.append(os.path.join('..', '..', 'io', 'mongoconnector'))
+sys.path.append(os.path.join('..', '..', 'model'))
+
 from mongohandler import MongoHandler
 from product import Product
 from user import User
 from mappeduser import MappedUser
 from mappedproduct import MappedProduct
-from pymongo import MongoClient
 from datetime import date, datetime
 
 def getUsersFromDBResult(db_users):
