@@ -1,8 +1,4 @@
-import os, sys
-sys.path.append(os.path.join('..', 'mapper'))
-
-import mapper
-from mapper import Mapper
+from ..mapper.mapper import Mapper
 
 class MappedProduct(object):
 	def __init__(self, product):

@@ -1,5 +1,3 @@
-from purchase import Purchase
-
 class Product(object):
 
 	def addToPurchases(self, purchase):
@@ -8,10 +6,9 @@ class Product(object):
 		else:
 			ValueError('purchase object must be of type Purchase')
 
-	def __init__(self, prodID, name, categories, imageURL, purchases = None):
+	def __init__(self, prodID, name, categories, imageURL):
 		self._id = prodID
 		self._name = name
 		self._categories = categories		
 		self._mainCategory = categories[0]
-		self._purchases = purchases
 

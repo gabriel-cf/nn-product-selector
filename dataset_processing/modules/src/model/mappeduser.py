@@ -1,8 +1,5 @@
-import os, sys
-sys.path.append(os.path.join('..', 'mapper'))
-
 from datetime import date, datetime
-from mapper import Mapper
+from ..mapper.mapper import Mapper
 
 class MappedUser(object):
 	""" MappedUser object for storing data retrieved from the DB """

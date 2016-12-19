@@ -1,15 +1,14 @@
-import os, sys
-sys.path.append(os.path.join('..', 'util'))
+import os
 import json
-from utils import eprint # Print to STDERR
+from ..util.utils import eprint # Print to STDERR
 
 class Mapper(object):
 	""" Static class contaning methods for mapping nationality
 		and category values
 	"""
 	# Constants
-	NATIONALITY_MAPPER_FILE = "nationality_mapper.json"
-	CATEGORY_MAPPER_FILE = "category_mapper.json"
+	NATIONALITY_MAPPER_FILE = "{0}/{1}".format(os.environ['DATA_PROCESSING_DIR'], 'modules/config/mapper/nationality_mapper.json')
+	CATEGORY_MAPPER_FILE = "{0}/{1}".format(os.environ['DATA_PROCESSING_DIR'], 'modules/config/mapper/category_mapper.json')
 	NATIONALITY_MAPPER_ID = "nationality_mapper"
 	CATEGORY_MAPPER_ID = "category_mapper"
 
@@ -81,4 +80,3 @@ class Mapper(object):
 		else:
 			eprint("Provided key for gender is neither 'M' nor 'F'")
 			return None
-		
