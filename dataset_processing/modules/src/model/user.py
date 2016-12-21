@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from purchase import Purchase
 
 class User(object):
 	""" User object for storing data retrieved from the DB """
@@ -23,16 +24,24 @@ class User(object):
 		else:
 			return 4
 
-	def __init__(self, username, gender, birthDay, nationality):
+	def addPurchase(self, purchase):
+		if (type(purchase) is Purchase):
+			self._purchases.append(purchase)
+		else:
+			raise ValueError('purchase object must be of type Purchase')
+		
+
+	def __init__(self, username, gender, birthDay, nationality, purchases = []):
 		""" username : String
 			gender : M | F
 			birthDay : Date
 			nationality : String 
+			purchases : Purchase[]
 		"""
 		self._username = username
 		self._gender = gender
 		self._age = self.getAgeFromBirthDate(birthDay)
 		self._nationality = nationality
 		self._ageGroup = self.getAgeGroup()
-
+		self._purchases = purchases
 
