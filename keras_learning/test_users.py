@@ -22,10 +22,16 @@ model.add(Dense(1, init='normal', activation='sigmoid'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy']) #Adam = efficient gradient descent
 
 # Fit the model
-model.fit(X, Y, nb_epoch=300, batch_size=10)
+model.fit(X, Y, nb_epoch=50, batch_size=10)
 
 # evaluate the model
 scores = model.evaluate(X, Y)
 print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+
+print("###############")
+
+X = numpy.array([dataset[0, 0:3]])
+
+print(model.predict(X))
 
  

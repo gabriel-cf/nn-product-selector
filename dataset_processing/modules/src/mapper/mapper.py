@@ -21,15 +21,10 @@ class Mapper(object):
 		""" Returns a JSON which can be accessed
 		 	as a dictionary
 		"""
-		def readFile(fileName):
-			""" Returns a file's content """
-			file = open(fileName, 'rb')
-			text = file.read()
-			file.close()
-			return text
+		with open(fileName) as data_file:    
+			data = json.load(data_file)
 
-		fileContent = readFile(fileName)
-		return json.loads(fileContent)
+		return data
 
 	@staticmethod
 	def updateMappers():

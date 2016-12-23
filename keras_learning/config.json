@@ -1,0 +1,3 @@
+{
+  "DEFAULT_TRAINING_FILE":"resources/cold_start_training_dataset.csv"
+}

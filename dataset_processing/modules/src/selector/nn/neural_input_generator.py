@@ -1,5 +1,4 @@
 #!/usr/bin/python2.7
-
 from ...io.mongoconnector.mongohandler import MongoHandler
 from ...model.product import Product
 from ...model.user import User
@@ -25,7 +24,7 @@ def getUsersFromDBResult(db_users):
 		nationality = db_user['nat']
 		# Transform string date to date object
 		dateOfBirth = datetime.strptime(dateOfBirth.split(' ')[0], '%Y-%m-%d')
-		#print("{};{};{};{}".format(username, gender, dateOfBirth.year, nationality))
+		logger.debug("{};{};{};{}".format(username, gender, dateOfBirth.year, nationality))
 		user = User(username, gender, dateOfBirth, nationality)
 		retrievedUsers.append(user)
 	logger.info('Users processed')
@@ -46,6 +45,9 @@ def getProductsFromDBResult(db_products):
 		if (categories):
 			product = Product(idP, name, categories, imageUrl)
 			retrievedProducts.append(product)
+
+		logger.debug("{};{};{}".format(product._id.encode('utf-8'), product._name.encode('utf-8'), product._mainCategory.encode('utf-8')))
+
 
 	logger.info('Products processed')
 	return retrievedProducts
@@ -70,7 +72,7 @@ if __name__ == '__main__':
 
 	logger.info('Mapping products')
 	for product in products:
-		logger.debug("{} --> {}".format(product._mainCategory, MappedProduct(product)._mainCategory))
+		#logger.debug("{} --> {}".format(product._mainCategory, MappedProduct(product)._mainCategory))
 		mappedProducts.append(MappedProduct(product))
 	logger.info('Products mapped')
 
