@@ -16,7 +16,7 @@ class NNInput(object):
 	""" An object that translates values from a mapped user 
 		and a product into a format understandable by the NN
 	"""
-
+	@staticmethod
 	def getNNInput(mapped_user, mapped_product, only_entry=False):
 		""" mapped_user --> MappedUser object
 		 	mapped_product --> MappedProduct object
@@ -36,21 +36,21 @@ class NNInput(object):
 			]
 		if only_entry:
 			return input_entry
-		t_X = np.array([])
-		t_X.append(input_entry)
+		t_X = np.array([input_entry])
 		return t_X
 
+	@staticmethod
 	def getNNInputList(mapped_user_product_tuple_list):
 		""" Takes a list of tuples (mapped_user, mapped_product)
 			and returns a list of inputs ready to be processed by the NN
 		"""
-		t_X = np.array([])
+		t_X = []
 		for user, product in mapped_user_product_tuple_list:
-			t_X.append(getNNInput(user, product, only_entry=True))
-		return t_X
+			t_X.append(NNInput.getNNInput(user, product, only_entry=True))
+		return np.array(t_X)
 
 	def __init__(self, mapped_user, mapped_product):
-		self._value = getNNInput(mapped_user, mapped_product)
+		self._value = NNInput.getNNInput(mapped_user, mapped_product)
 
 class NNOutput(object):
 	""" An object that translates a list of decimal output values into 
