@@ -12,13 +12,13 @@ class Purchase(object):
 		if (type(product) is Product):
 			self._product = product
 		else:
-			raise ValueError('product attribute must be of type Product')
+			raise TypeError('product attribute must be of type Product')
 		if (type(purchase_date) is Date):
 			self._purchase_date = purchase_date
 		else:
-			raise ValueError('purchase_date attribute must be of type Date')
+			raise TypeError('purchase_date attribute must be of type Date')
 		if (isinstance(rating, Number) or (rating is None)):
 			self._rating = rating	
 		else:
-			raise ValueError('rating attribute must be of type Number or None')
+			raise TypeError('rating attribute must be of type Number or None')
 		

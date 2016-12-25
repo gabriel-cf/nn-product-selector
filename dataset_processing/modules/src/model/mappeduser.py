@@ -10,4 +10,4 @@ class MappedUser(object):
 		""" 
 		self._gender = Mapper.getGenderValue(user._gender)
 		self._nationality = Mapper.getNationalityValue(user._nationality)
-		self._ageGroup = user._ageGroup
+		self._age = user._age

@@ -28,7 +28,7 @@ class User(object):
 		if (type(purchase) is Purchase):
 			self._purchases.append(purchase)
 		else:
-			raise ValueError('purchase object must be of type Purchase')
+			raise TypeError('purchase object must be of type Purchase')
 		
 
 	def __init__(self, username, gender, birthDay, nationality, purchases = []):
