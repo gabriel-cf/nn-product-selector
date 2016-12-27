@@ -4,8 +4,7 @@ from dataset_processing.modules.src.model.product import Product
 from dataset_processing.modules.src.model.user import User
 from dataset_processing.modules.src.model.mappeduser import MappedUser
 from dataset_processing.modules.src.model.mappedproduct import MappedProduct
-from keras_learning.nn import NN
-from keras_learning.nn import NNInput
+from keras_learning.nn import NN, NNInput, NNOutput
 from datetime import date, datetime
 from random import randint
 
@@ -110,7 +109,7 @@ if __name__ == '__main__':
 	i = 0
 	for user, product in mapped_user_product_list:
 		logger.debug("User: Nationality={};Gender={};Age={} Product: Category={};Avg Rating={}".format(user._nationality, user._gender, user._age, product._mainCategory, product._avgRating))
-		logger.info("\033[32m Like: %.6f%%\033[0m" % (predictions[i][0] * 100))
+		logger.info("\033[32m Like: %.6f%%\033[0m" % (NNOutput.translatePredictionToDecimal(predictions[i]) * 100))
 		i = i + 1
 
 

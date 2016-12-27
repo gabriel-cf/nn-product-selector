@@ -56,8 +56,9 @@ class NNOutput(object):
 	""" An object that translates a list of decimal output values into 
 		a format understandable by the NN
 	"""
-	MAX_VALUE = 5
+	MAX_VALUE = 5.0
 
+	@staticmethod
 	def getNNOutput(outputValue):
 		""" outputValue --> decimal value within [0, NNOutput.MAX_VALUE]
 			returns --> numpy matrix where each row is an expected output
@@ -73,8 +74,14 @@ class NNOutput(object):
 		t_Y.append([float(outputValue)])
 		return t_Y
 
+	@staticmethod
+	def translatePredictionToDecimal(nnOutputValue):
+		if (nnOutputValue is None):
+			raise ValueError('nnOutputValue must have a decimal value non None')
+		return nnOutputValue[0]
+
 	def __init__(self, outputValue):
-		self._value = getNNOutput(outputValue)
+		self._value = NNOutput.getNNOutput(outputValue)
 
 class NNTrainingInputSet(object):
 	"""docstring for NNTrainingInput"""
@@ -108,7 +115,7 @@ class NN(object):
 	SEED = 7
 	NN_INPUTS = 5 # {user_nationality_mapped, user_sex_mapped, user_age, product_category_mapped}
 	NN_OUTPUTS = 1 # {like_probability}
-	NN_DEFAULT_EPOCHS = 200
+	NN_DEFAULT_EPOCHS = 70
 	NN_DEFAULT_BATCH_SIZE = 10
 	NN_DEFAULT_TRAINING_FILE = os.path.join(SCRIPT_DIR, CONFIG_DIC['USER_PRODUCT_TRAINING_FILE'])
 	NETWORK = None # Neural Network built upon a Keras model
