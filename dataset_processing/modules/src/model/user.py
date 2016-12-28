@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from purchase import Purchase
+from enum.sexenum import Sex
 
 class User(object):
 	""" User object for storing data retrieved from the DB """
@@ -33,13 +34,13 @@ class User(object):
 
 	def __init__(self, username, gender, birthDay, nationality, purchases = []):
 		""" username : String
-			gender : M | F
+			gender : String "M[ALE]" | "F[EMALE]" lower case allowed
 			birthDay : Date
 			nationality : String 
 			purchases : Purchase[]
 		"""
 		self._username = username
-		self._gender = gender
+		self._gender = Sex.getGenderValue(gender) # Returns either Sex.MALE or Sex.FEMALE
 		self._age = self.getAgeFromBirthDate(birthDay)
 		self._nationality = nationality
 		self._ageGroup = self.getAgeGroup()

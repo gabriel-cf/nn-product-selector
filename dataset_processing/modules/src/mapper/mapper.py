@@ -1,6 +1,7 @@
 import os
 import json
 from ..util.utils import eprint # Print to STDERR
+from ..model.enum.sexenum import Sex
 
 class Mapper(object):
 	""" Static class contaning methods for mapping nationality
@@ -56,6 +57,17 @@ class Mapper(object):
 			eprint("Provided Key '{0}' is not a valid key".format(key))
 		return value
 
+	@staticmethod
+	def getAllAvailableNationalities():
+		if (Mapper.nationality_mapper is None):
+			Mapper.updateMappers()
+		return Mapper.nationality_mapper.keys()
+
+	@staticmethod
+	def getAllAvailableCategories():
+		if (Mapper.category_mapper is None):
+			Mapper.updateMappers()
+		return Mapper.category_mapper.keys()
 
 	@staticmethod
 	def getNationalityValue(nationality):
@@ -67,11 +79,9 @@ class Mapper(object):
 
 	@staticmethod
 	def getGenderValue(gender):
-		gender = gender.capitalize()[0]
-		if (gender == 'M'):
+		if (gender == Sex.MALE):
 			return '0'
-		elif (gender == 'F'):
+		elif (gender == Sex.FEMALE):
 			return '1'
 		else:
-			eprint("Provided key for gender is neither 'M' nor 'F'")
-			return None
+			raise ValueError("Provided key %s for gender is neither Sex.MALE nor Sex.FEMALE" % (gender))

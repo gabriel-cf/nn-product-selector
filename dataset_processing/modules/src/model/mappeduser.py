@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from ..mapper.mapper import Mapper
+from enum.sexenum import Sex
 
 class MappedUser(object):
 	""" MappedUser object for storing data retrieved from the DB """

@@ -4,6 +4,11 @@ from dataset_processing.modules.src.model.product import Product
 from dataset_processing.modules.src.model.user import User
 from dataset_processing.modules.src.model.mappeduser import MappedUser
 from dataset_processing.modules.src.model.mappedproduct import MappedProduct
+from dataset_processing.modules.src.model.scenario.scenariogenerator import ScenarioGenerator
+from dataset_processing.modules.src.model.scenario.rulegenerator import RuleGenerator
+from dataset_processing.modules.src.model.scenario.rule import Rule
+from dataset_processing.modules.src.mapper.mapper import Mapper
+
 from keras_learning.nn import NN, NNInput, NNOutput
 from datetime import date, datetime
 from random import randint
@@ -43,7 +48,6 @@ def getProductsFromDBResult(db_products):
 	""" Receives the dictionary result of the query against
 	 	the DB and returns an array of mapped Product objects
 	"""
-	logger.info('Processing products from data base results')
 	retrievedProducts = []
 	i = 0
 	for db_product in db_products:
@@ -64,17 +68,83 @@ def getProductsFromDBResult(db_products):
 	logger.info('Products processed')
 	return retrievedProducts
 
-if __name__ == '__main__':
-	logger.info('Executing Neural Input Generator')
+def getUsersByNationalityFromDB(mongohandler):
+	""" Returns a dictionary holding the users for every nationality
+		straight from the query result
+	"""
+	db_nationality_dic = {}
+	for nationality_name in Mapper.getAllAvailableNationalities():
+		db_nationality_dic[nationality_name] = mongohandler.getUsersByParameters(nationality=nationality_name)
 
+	return db_nationality_dic
+
+def getProductsByCategoryFromDB(mongohandler):
+	""" Returns a dictionary holding the products for every category
+		straight from the query result
+	"""
+	i = 0
+	db_category_dic = {}
+	for category_name in Mapper.getAllAvailableCategories():
+		if (i == 2):
+			break
+		db_category_dic[category_name] = mongohandler.getProductsByParameters(category=category_name)
+		i+=1
+
+	return db_category_dic
+
+def mapUsers(processed_user_l):
+	return map(lambda x: MappedUser(x), processed_user_l)
+
+def mapProducts(processed_product_l):
+	return map(lambda x: MappedProduct(x), processed_product_l)
+
+def processToMap(old_dic, func):
+	new_dic = {}
+	for key in old_dic:
+		new_dic[key] = func(old_dic[key])
+	return new_dic
+
+def processUsersFromDBResult(db_user_dic):
+	return processToMap(db_user_dic, getUsersFromDBResult)
+
+def mapProcessedUsers(processed_user_dic):
+	return processToMap(processed_user_dic, mapUsers)
+
+def processProductsFromDBResult(db_product_dic):
+	return processToMap(db_product_dic, getProductsFromDBResult)
+
+def mapProcessedProducts(processed_product_dic):
+	return processToMap(processed_product_dic, mapProducts)
+
+
+if __name__ == '__main__':
+	logger.info('Generating random scenario')
+	nnTrainingInputSet = ScenarioGenerator.generateTrainingInputSet()
+
+	logger.info('Executing Neural Input Generator')
 	logger.info('Loading Neural Network')
-	network = NN.getInstance()
+	network = NN.getInstance(loadDataFromDefaultFile=False)
+	logger.info('Setting Training Input')
+	network.setTrainingInput(nnTrainingInputSet)
+	logger.info('Training Network')
+	network.trainModel()
 
 	logger.info('Establishing connection with DB')
 	mongoHandler = MongoHandler()
 	logger.info('Retrieving users from DB')
-	db_users = mongoHandler.getUsersFromDB()
-	users = getUsersFromDBResult(db_users)
+	# User processing
+	db_user_dic = getUsersByNationalityFromDB(mongoHandler) #mongoHandler.getAllUsers()
+	logger.info('Processing users from data base results')
+	processed_user_dic = processUsersFromDBResult(db_user_dic)
+	mapped_user_dic = mapProcessedUsers(processed_user_dic)
+
+	# Product processing
+	db_product_dic = getProductsByCategoryFromDB(mongoHandler) #mongoHandler.getAllUsers()
+	logger.info('Processing products from data base results')
+	processed_product_dic = processProductsFromDBResult(db_product_dic)
+	mapped_product_dic = mapProcessedProducts(processed_product_dic)
+
+	users = getUsersFromDBResult(db_user_dic['ES'])
 	mappedUsers = []
 	logger.info('Mapping users')
 	for user in users:
@@ -85,7 +155,7 @@ if __name__ == '__main__':
 	logger.info('Users mapped')
 
 	logger.info('Retrieving products from DB')
-	db_products = mongoHandler.getProductsFromDB()
+	db_products = mongoHandler.getAllProducts()
 	products = getProductsFromDBResult(db_products)
 	mappedProducts = []
 
@@ -102,6 +172,7 @@ if __name__ == '__main__':
 	
 	logger.info('zipping lists')
 	mapped_user_product_list = zip(mappedUsers, mappedProducts)
+
 	logger.info('Creating NNInput list')
 	inputSet = NNInput.getNNInputList(mapped_user_product_list)
 	logger.info('Getting predictions')

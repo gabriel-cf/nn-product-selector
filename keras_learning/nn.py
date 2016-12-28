@@ -59,19 +59,21 @@ class NNOutput(object):
 	MAX_VALUE = 5.0
 
 	@staticmethod
-	def getNNOutput(outputValue):
+	def getNNOutput(outputValue, only_entry=False):
 		""" outputValue --> decimal value within [0, NNOutput.MAX_VALUE]
 			returns --> numpy matrix where each row is an expected output
 		"""
 		if (not isinstance(outputValue, Number) or outputValue is None):
 			raise TypeError('outputValue must be of type Number')
-		t_Y = np.array([])
 		# Normalize value between [0, NNOutput.MAX_VALUE]
 		if (outputValue > NNOutput.MAX_VALUE):
 			outputValue = 1.0
 		elif (outputValue > 1.0):
 			outputValue = outputValue / 5
-		t_Y.append([float(outputValue)])
+		entry = [float(outputValue)]
+		if only_entry:
+			return entry
+		t_Y = np.array([entry])
 		return t_Y
 
 	@staticmethod
@@ -85,19 +87,32 @@ class NNOutput(object):
 
 class NNTrainingInputSet(object):
 	"""docstring for NNTrainingInput"""
-	def addToTrainingInput(mapped_user, mapped_product, expected_like):
-		nn_input = NNInput(mapped_user, mapped_product)
-		nn_output = NNOutput(expected_like)
-		self._input.extend(nn_input._set) # Concatenate in the original input list
-		self._output.extend(nn_output._set)
+	def addToTrainingInput(self, mapped_user, mapped_product, expected_like):
+		nn_input = NNInput.getNNInput(mapped_user, mapped_product, only_entry = True)
+		nn_output = NNOutput.getNNOutput(expected_like, only_entry = True)
+		self._input.append(nn_input) # Concatenate in the original input list
+		self._output.append(nn_output)
+
+	def getInput(self):
+		if self._converted:
+			return self._input
+		return np.array(self._input)
+	def getOutput(self):
+		if self._converted:
+			return self._output
+		return np.array(self._output)
+
 
 	def __init__(self, x=None, y=None):
 		""" x --> numpy.array([]) holding input values
 			y --> numpy.array([]) holding output values
 		""" 
+		self._converted = False
 		if (x is None or y is None):
-			x = np.array([])
-			y = np.array([])
+			x = []
+			y = []
+		else: # numpy array from file conversion
+			self._converted = True
 		self._input = x
 		self._output = y
 		
@@ -112,15 +127,15 @@ class NN(object):
 	CONFIG_DIC = None
 	with open(CONFIG_FILE) as json_file:    
 		CONFIG_DIC = json.load(json_file)
-	SEED = 7
+	#SEED = 7
 	NN_INPUTS = 5 # {user_nationality_mapped, user_sex_mapped, user_age, product_category_mapped}
 	NN_OUTPUTS = 1 # {like_probability}
-	NN_DEFAULT_EPOCHS = 70
-	NN_DEFAULT_BATCH_SIZE = 10
+	NN_DEFAULT_EPOCHS = 10
+	NN_DEFAULT_BATCH_SIZE = 500
 	NN_DEFAULT_TRAINING_FILE = os.path.join(SCRIPT_DIR, CONFIG_DIC['USER_PRODUCT_TRAINING_FILE'])
 	NETWORK = None # Neural Network built upon a Keras model
 	## Class random init ##
-	np.random.seed(SEED)
+	#np.random.seed(SEED)
 	RLOCK = RLock()
 
 	@staticmethod
@@ -190,12 +205,22 @@ class NN(object):
 		NN.RLOCK.release()
 		return prediction
 
+	def setTrainingInput(self, trainingInputSet):
+		
+		if ((trainingInputSet == None) or (not isinstance(trainingInputSet, NNTrainingInputSet))):
+			raise TypeError('trainingInputSet object must be of type TrainingInputSet')
+		else:
+			NN.RLOCK.acquire()
+			logger.debug(trainingInputSet.getInput())
+			self._traningInputSet = trainingInputSet
+			NN.RLOCK.release()
+
 	def getTrainingInput(self):
-		return self._traningInputSet._input
+		return self._traningInputSet.getInput()
 
 	def getTrainingOutput(self):
-		return self._traningInputSet._output
+		return self._traningInputSet.getOutput()
 
-	def __init__(self):
+	def __init__(self, trainingInputSet = None):
 		self._model = None
 		self._traningInputSet = NNTrainingInputSet()
