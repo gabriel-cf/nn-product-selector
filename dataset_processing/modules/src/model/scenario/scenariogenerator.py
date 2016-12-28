@@ -79,8 +79,11 @@ class ScenarioGenerator:
 		nnTrainingInputSet = NNTrainingInputSet()
 		# For each combination of users and products under a given rule
 		no_combinations = len(dummy_combinations)
+		rule_dic = {}
 		i = 0
 		for users, products, rule in dummy_combinations:
+			# Map rule for the given combination nationalityXcategory
+			rule_dic[(MappedUser(users[0])._nationality, MappedProduct(products[0])._mainCategory)] = rule
 			# Combine every user with all products
 			combinations = itertools.product(users, products)
 			for user, product in combinations:
@@ -90,7 +93,7 @@ class ScenarioGenerator:
 			i += 1
 			logger.info("Finished combination %s of %s" % (i, no_combinations))
 
-		return nnTrainingInputSet
+		return nnTrainingInputSet, rule_dic
 
 
 

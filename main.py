@@ -1,5 +1,6 @@
 #!/usr/bin/python2.7
 from dataset_processing.modules.src.io.mongoconnector.mongohandler import MongoHandler
+from dataset_processing.modules.src.model.enum.sexenum import Sex
 from dataset_processing.modules.src.model.product import Product
 from dataset_processing.modules.src.model.user import User
 from dataset_processing.modules.src.model.mappeduser import MappedUser
@@ -119,7 +120,7 @@ def mapProcessedProducts(processed_product_dic):
 
 if __name__ == '__main__':
 	logger.info('Generating random scenario')
-	nnTrainingInputSet = ScenarioGenerator.generateTrainingInputSet()
+	nnTrainingInputSet, rule_dic = ScenarioGenerator.generateTrainingInputSet()
 
 	logger.info('Executing Neural Input Generator')
 	logger.info('Loading Neural Network')
@@ -179,8 +180,17 @@ if __name__ == '__main__':
 	predictions = network.predict(inputSet)
 	i = 0
 	for user, product in mapped_user_product_list:
+		rule = rule_dic[(user._nationality, product._mainCategory)]
+		if (i == 0):
+			logger.info("Using rule: %r" % rule)
+		
+		rule_prediction = rule.getEstimatedLikeValue(user._age, (Sex.MALE if user._gender == 0 else Sex.FEMALE), product._avgRating)
+		nn_prediction = NNOutput.translatePredictionToDecimal(predictions[i])
 		logger.debug("User: Nationality={};Gender={};Age={} Product: Category={};Avg Rating={}".format(user._nationality, user._gender, user._age, product._mainCategory, product._avgRating))
-		logger.info("\033[32m Like: %.6f%%\033[0m" % (NNOutput.translatePredictionToDecimal(predictions[i]) * 100))
+		logger.info("\033[32mRULE Like: %.6f%%\033[0m" % (rule_prediction * 100))
+		logger.info("\033[32mNN Like: %.6f%%\033[0m" % (nn_prediction * 100))		
+		logger.info("\033[33mDiff = %.6f%%\033[0m" % ((rule_prediction - nn_prediction) * 100))
+		logger.info("------------------------")
 		i = i + 1
 
 
