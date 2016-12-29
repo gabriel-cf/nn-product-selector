@@ -130,8 +130,8 @@ class NN(object):
 	#SEED = 7
 	NN_INPUTS = 5 # {user_nationality_mapped, user_sex_mapped, user_age, product_category_mapped}
 	NN_OUTPUTS = 1 # {like_probability}
-	NN_DEFAULT_EPOCHS = 50
-	NN_DEFAULT_BATCH_SIZE = 500
+	NN_DEFAULT_EPOCHS = 10
+	NN_DEFAULT_BATCH_SIZE = 250
 	NN_DEFAULT_TRAINING_FILE = os.path.join(SCRIPT_DIR, CONFIG_DIC['USER_PRODUCT_TRAINING_FILE'])
 	NETWORK = None # Neural Network built upon a Keras model
 	## Class random init ##

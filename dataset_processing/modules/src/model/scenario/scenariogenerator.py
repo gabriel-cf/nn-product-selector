@@ -87,9 +87,10 @@ class ScenarioGenerator:
 			# Combine every user with all products
 			combinations = itertools.product(users, products)
 			for user, product in combinations:
-				sex = user._gender
-				expected_like = rule.getEstimatedLikeValue(user._age, user._gender, product._avgRating)
-				nnTrainingInputSet.addToTrainingInput(MappedUser(user), MappedProduct(product), expected_like)
+				mapped_user = MappedUser(user)
+				mapped_product = MappedProduct(product)
+				expected_like = rule.getEstimatedLikeValue(mapped_user, mapped_product)
+				nnTrainingInputSet.addToTrainingInput(mapped_user, mapped_product, expected_like)
 			i += 1
 			logger.info("Finished combination %s of %s" % (i, no_combinations))
 

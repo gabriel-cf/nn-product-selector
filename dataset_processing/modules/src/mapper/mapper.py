@@ -13,6 +13,9 @@ class Mapper(object):
 	NATIONALITY_MAPPER_ID = "nationality_mapper"
 	CATEGORY_MAPPER_ID = "category_mapper"
 
+	SEX_MALE = '0'
+	SEX_FEMALE = '1'
+
 	# Static variables
 	nationality_mapper = None
 	category_mapper = None
@@ -80,8 +83,17 @@ class Mapper(object):
 	@staticmethod
 	def getGenderValue(gender):
 		if (gender == Sex.MALE):
-			return '0'
+			return Mapper.SEX_MALE
 		elif (gender == Sex.FEMALE):
-			return '1'
+			return Mapper.SEX_FEMALE
 		else:
 			raise ValueError("Provided key %s for gender is neither Sex.MALE nor Sex.FEMALE" % (gender))
+
+	@staticmethod
+	def getGenderValueFromMapped(mapped_gender):
+		if (mapped_gender == Mapper.SEX_MALE):
+			return Sex.MALE
+		elif (mapped_gender == Mapper.SEX_FEMALE):
+			return Sex.FEMALE
+		else:
+			raise ValueError("Provided key %s for gender is neither Mapper.SEX_MALE nor Mapper.SEX_MALE" % (mapped_gender))

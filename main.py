@@ -184,7 +184,7 @@ if __name__ == '__main__':
 		if (i == 0):
 			logger.info("Using rule: %r" % rule)
 		
-		rule_prediction = rule.getEstimatedLikeValue(user._age, (Sex.MALE if user._gender == 0 else Sex.FEMALE), product._avgRating)
+		rule_prediction = rule.getEstimatedLikeValue(user, product)
 		nn_prediction = NNOutput.translatePredictionToDecimal(predictions[i])
 		logger.debug("User: Nationality={};Gender={};Age={} Product: Category={};Avg Rating={}".format(user._nationality, user._gender, user._age, product._mainCategory, product._avgRating))
 		logger.info("\033[32mRULE Like: %.6f%%\033[0m" % (rule_prediction * 100))

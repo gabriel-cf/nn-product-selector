@@ -29,10 +29,10 @@ class Rule(object):
 		else:
 			return avg_rating / Rule.MAX_RATING
 
-	def getEstimatedLikeValue(self, age, sex, avg_rating):
-		w_sex = self._w_male if sex == Sex.MALE else self._w_female
+	def getEstimatedLikeValue(self, mapped_user, mapped_product):
+		w_sex = self._w_male if(mapped_user.getGenderValueFromMapped() == Sex.MALE) else self._w_female
 		# 0.0 <= Sum of weights <= Rule.MAX_RATING ; 0.0 <= normalized values <= Rule.MAX_NORMALIZED_VALUE
-		like = self._w_age * self.normalizeAge(age) + w_sex + self._w_avg_rating * self.normalizeAvgRating(avg_rating)
+		like = self._w_age * self.normalizeAge(mapped_user._age) + w_sex + self._w_avg_rating * self.normalizeAvgRating(mapped_product._avgRating)
 		return like
 
 	def __repr__(self):
