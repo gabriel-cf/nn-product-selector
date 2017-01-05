@@ -13,6 +13,8 @@ from dataset_processing.modules.src.mapper.mapper import Mapper
 from keras_learning.nn import NN, NNInput, NNOutput
 from datetime import date, datetime
 from random import randint
+import numpy as np
+import matplotlib.pyplot as plt
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -179,6 +181,9 @@ if __name__ == '__main__':
 	logger.info('Getting predictions')
 	predictions = network.predict(inputSet)
 	i = 0
+	xAxis = np.array(range(0, len(mapped_user_product_list)))
+	nPredictionPlot = []
+	rPredictionPlot = []
 	for user, product in mapped_user_product_list:
 		rule = rule_dic[(user._nationality, product._mainCategory)]
 		if (i == 0):
@@ -191,7 +196,11 @@ if __name__ == '__main__':
 		logger.info("\033[32mNN Like: %.6f%%\033[0m" % (nn_prediction * 100))		
 		logger.info("\033[33mDiff = %.6f%%\033[0m" % ((rule_prediction - nn_prediction) * 100))
 		logger.info("------------------------")
+		rPredictionPlot.append(rule_prediction)
+		nPredictionPlot.append(nn_prediction)
 		i = i + 1
-
-
-
+	nPredictionPlot = np.array(nPredictionPlot)
+	rPredictionPlot = np.array(rPredictionPlot)
+	plt.plot(xAxis,nPredictionPlot,'bs',xAxis,rPredictionPlot,'r^')
+	plt.ylabel('NN and Rule predictions')
+	plt.show()
