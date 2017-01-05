@@ -1,0 +1,6 @@
+{
+  "DEFAULT_TRAINING_FILE":"keras_learning/resources/cold_start_training_dataset.csv",
+  "USER_PRODUCT_TRAINING_FILE":"keras_learning/resources/test_data/user_product.csv",
+  "NATIONALITY_MAPPER_FILE":"dataset_processing/modules/config/mapper/nationality_mapper.json",
+  "CATEGORY_MAPPER_FILE":"dataset_processing/modules/config/mapper/category_mapper.json"
+}

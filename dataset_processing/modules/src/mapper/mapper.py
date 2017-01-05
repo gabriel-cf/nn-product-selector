@@ -2,14 +2,16 @@ import os
 import json
 from ..util.utils import eprint # Print to STDERR
 from ..model.enum.sexenum import Sex
+from .....definitions import MAPPER_NATIONALITY_FILE, MAPPER_CATEGORY_FILE
+
 
 class Mapper(object):
 	""" Static class contaning methods for mapping nationality
 		and category values
 	"""
 	# Constants
-	NATIONALITY_MAPPER_FILE = "{0}/{1}".format(os.environ['DATA_PROCESSING_DIR'], 'modules/config/mapper/nationality_mapper.json')
-	CATEGORY_MAPPER_FILE = "{0}/{1}".format(os.environ['DATA_PROCESSING_DIR'], 'modules/config/mapper/category_mapper.json')
+	NATIONALITY_MAPPER_FILE = MAPPER_NATIONALITY_FILE # From definitions.py
+	CATEGORY_MAPPER_FILE = MAPPER_CATEGORY_FILE
 	NATIONALITY_MAPPER_ID = "nationality_mapper"
 	CATEGORY_MAPPER_ID = "category_mapper"
 

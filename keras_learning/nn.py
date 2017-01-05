@@ -4,6 +4,7 @@ from numbers import Number
 from keras.models import Sequential
 from ..dataset_processing.modules.src.model.mappedproduct import MappedProduct
 from ..dataset_processing.modules.src.model.mappeduser import MappedUser
+from ..definitions import NN_TRAINING_FILE
 
 from keras.layers import Dense
 from threading import RLock
@@ -121,18 +122,12 @@ class NN(object):
 	""" Neural network class (Thread-safe) """
 	
 	## Constants ##
-	SCRIPT_DIR = os.path.dirname(__file__)
-	CONFIG_FILE = os.path.join(SCRIPT_DIR,'config.json')
-
-	CONFIG_DIC = None
-	with open(CONFIG_FILE) as json_file:    
-		CONFIG_DIC = json.load(json_file)
 	#SEED = 7
 	NN_INPUTS = 5 # {user_nationality_mapped, user_sex_mapped, user_age, product_category_mapped}
 	NN_OUTPUTS = 1 # {like_probability}
 	NN_DEFAULT_EPOCHS = 100
 	NN_DEFAULT_BATCH_SIZE = 500
-	NN_DEFAULT_TRAINING_FILE = os.path.join(SCRIPT_DIR, CONFIG_DIC['USER_PRODUCT_TRAINING_FILE'])
+	NN_DEFAULT_TRAINING_FILE = NN_TRAINING_FILE # From definitions.py
 	NETWORK = None # Neural Network built upon a Keras model
 	## Class random init ##
 	#np.random.seed(SEED)

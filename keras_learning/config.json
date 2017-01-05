@@ -1,4 +1,0 @@
-{
-  "DEFAULT_TRAINING_FILE":"resources/cold_start_training_dataset.csv",
-  "USER_PRODUCT_TRAINING_FILE":"resources/test_data/user_product.csv"
-}
