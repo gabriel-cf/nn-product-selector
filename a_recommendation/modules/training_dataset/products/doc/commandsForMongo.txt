@@ -1,0 +1,5 @@
+client = MongoClient('localhost', 27017)
+db = client.tfg_users
+db.users_collection.
+db = client.amazon_products
+db.products_collection.find
