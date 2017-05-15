@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 class NNInput(object):
-	""" An object that translates values from a mapped user 
+	""" An object that translates values from a mapped user
 		and a product into a format understandable by the NN
 	"""
 	@staticmethod
@@ -22,10 +22,10 @@ class NNInput(object):
 		if (not isinstance(mapped_product, MappedProduct) or mapped_product is None):
 			raise TypeError('mapped_product object must be of type MappedProduct')
 		input_entry = [
-			float(mapped_user._nationality), 
-			float(mapped_user._gender), 
+			float(mapped_user._nationality),
+			float(mapped_user._gender),
 			float(mapped_user._age),
-			float(mapped_product._mainCategory), 
+			float(mapped_product._mainCategory),
 			float(mapped_product._avgRating)
 			]
 		if only_entry:

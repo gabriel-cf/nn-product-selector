@@ -1,12 +1,14 @@
 #!/usr/bin/python2.7
-from modules.dataset_processing.modules.src.io.mongoconnector.mongohandler import MongoHandler
-from modules.dataset_processing.modules.src.model.product import Product
-from modules.dataset_processing.modules.src.model.user import User
-from modules.dataset_processing.modules.src.model.mappeduser import MappedUser
-from modules.dataset_processing.modules.src.model.mappedproduct import MappedProduct
-from modules.dataset_processing.modules.src.mapper.mapper import Mapper
+import itertools
+from .modules.dataset_processing.modules.src.io.mongoconnector.mongohandler import MongoHandler
+from .modules.dataset_processing.modules.src.model.product import Product
+from .modules.dataset_processing.modules.src.model.user import User
+from .modules.dataset_processing.modules.src.model.mappeduser import MappedUser
+from .modules.dataset_processing.modules.src.model.mappedproduct import MappedProduct
+from .modules.dataset_processing.modules.src.mapper.mapper import Mapper
+from .modules.dataset_processing.modules.src.model.scenario.rule import Rule
 
-from modules.keras_learning.nn import NN
+from .modules.keras_learning.nn import NN
 from datetime import datetime
 
 import logging
@@ -14,14 +16,16 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # TODO - Increase when in prod
-dMAX = 3
+dMAX = 2000000
 
 class Loader(object):
     """Class that loads the users, products and Neural Network from the system"""
 
+    ANALYTICS = True
     NN = None
     CACHED_USER_DIC, CACHED_M_USER_DIC = (None, None) # By Nationalities
     CACHED_PRODUCT_DIC, CACHED_M_PRODUCT_DIC = (None, None) # By Categories
+    CACHED_RULES_DIC = dict() # [nationality, category]
     @staticmethod
     def getUsersFromDBResult(db_users):
         """ Receives the dictionary result of the query against
@@ -64,7 +68,13 @@ class Loader(object):
             imageUrl = db_product['image_url']
             if (categories):
                 product = Product(idP, name, categories, imageUrl)
-                product.setRandomRating()
+                if Loader.ANALYTICS:
+                    # Set Ratings
+                    db_ratings = MongoHandler.getInstance().getRatingsForProduct(idP)
+                    product.setRating([db_rating['_rating'] for db_rating in db_ratings])
+                else:
+                    product.setRandomRating()
+                logger.debug("prod_id:{}, avg_rating:{}".format(product._id, product._avgRating))
                 retrievedProducts.append(product)
             i+=1
         logger.info('Products processed')
@@ -110,7 +120,12 @@ class Loader(object):
         return Loader.processToMap(db_user_dic, Loader.getUsersFromDBResult)
 
     @staticmethod
-    def processProductsFromDBResult(db_product_dic):
+    def processProductsFromDBResult(db_product_dic, analytics=ANALYTICS):
+        if analytics != Loader.ANALYTICS:
+            Loader.ANALYTICS = not Loader.ANALYTICS
+            res = Loader.processToMap(db_product_dic, Loader.getProductsFromDBResult)
+            Loader.ANALYTICS = not Loader.ANALYTICS
+            return res
         return Loader.processToMap(db_product_dic, Loader.getProductsFromDBResult)
 
     @staticmethod
@@ -130,7 +145,6 @@ class Loader(object):
             logger.info('Processing users from data base results')
             processed_user_dic = Loader.processUsersFromDBResult(db_user_dic)
             mapped_user_dic = Loader.mapProcessedUsers(processed_user_dic)
-            print mapped_user_dic
 
             Loader.CACHED_USER_DIC = processed_user_dic
             Loader.CACHED_M_USER_DIC = mapped_user_dic # By Nationalities
@@ -138,22 +152,37 @@ class Loader(object):
         return Loader.CACHED_USER_DIC, Loader.CACHED_M_USER_DIC
 
     @staticmethod
-    def loadProducts():
-        if (Loader.CACHED_PRODUCT_DIC is None or Loader.CACHED_M_PRODUCT_DIC is None):
-            logger.info('Loading products from DB')
-            # Product processing
-            db_product_dic = Loader.getProductsByCategoryFromDB()
-            logger.info('Processing products from data base results')
-            processed_product_dic = Loader.processProductsFromDBResult(db_product_dic)
-            mapped_product_dic = Loader.mapProcessedProducts(processed_product_dic)
-            Loader.CACHED_PRODUCT_DIC = processed_product_dic
-            Loader.CACHED_M_PRODUCT_DIC = mapped_product_dic # By Nationalities
+    def loadProducts(analytics=ANALYTICS):
+        #if (Loader.CACHED_PRODUCT_DIC is None or Loader.CACHED_M_PRODUCT_DIC is None):
+        logger.info('Loading products from DB')
+        # Product processing
+        db_product_dic = Loader.getProductsByCategoryFromDB()
+        logger.info('Processing products from data base results')
+        processed_product_dic = Loader.processProductsFromDBResult(db_product_dic, analytics=analytics)
+        mapped_product_dic = Loader.mapProcessedProducts(processed_product_dic)
+        Loader.CACHED_PRODUCT_DIC = processed_product_dic
+        Loader.CACHED_M_PRODUCT_DIC = mapped_product_dic # By Nationalities
 
         return Loader.CACHED_PRODUCT_DIC, Loader.CACHED_M_PRODUCT_DIC
 
     @staticmethod
-    def loadNN():
-        if (Loader.NN is None):
-            Loader.NN = NN.getInstance()
-            Loader.NN.trainWithRandomScenario()
-        return Loader.NN
+    def loadRules():
+        rules = MongoHandler.getInstance().getAllRules()
+        for rule in rules:
+            Loader.CACHED_RULES_DIC[(Mapper.getNationalityValue(rule['_nationality']),\
+            Mapper.getCategoryValue(rule['_category']))]\
+            = Rule(rule['_w_age'], rule['_w_male'], rule['_w_female'], rule['_w_avg_rating'], rule['_older_better'], fromDB=True)
+
+    @staticmethod
+    def loadNN(load_rules=True):
+        # Note: specifying rules will train the network with random scenario
+        if not Loader.CACHED_RULES_DIC and load_rules:
+            Loader.loadRules()
+        network = NN.getInstance(rules=Loader.CACHED_RULES_DIC)
+        return network
+
+    @staticmethod
+    def reloadNN(load_rules=True):
+        if not Loader.CACHED_RULES_DIC and load_rules:
+            Loader.loadRules()
+        NN.trainNewInstance(rules=Loader.CACHED_RULES_DIC)

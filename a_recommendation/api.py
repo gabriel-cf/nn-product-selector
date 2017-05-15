@@ -1,13 +1,16 @@
 #!/usr/bin/python2.7
-from modules.dataset_processing.modules.src.io.mongoconnector.mongohandler import MongoHandler
-from modules.dataset_processing.modules.src.model.mappeduser import MappedUser
-from modules.dataset_processing.modules.src.model.category import Category
-from modules.dataset_processing.modules.src.model.recommendation import Recommendation
-from modules.dataset_processing.modules.src.mapper.mapper import Mapper
-from modules.dataset_processing.modules.src.io.response.recommendationresponse import RecommendationResponse
-from loader import Loader
+from .modules.dataset_processing.modules.src.io.mongoconnector.mongohandler import MongoHandler
+from .modules.dataset_processing.modules.src.model.mappeduser import MappedUser
+from .modules.dataset_processing.modules.src.model.category import Category
+from .modules.dataset_processing.modules.src.model.recommendation import Recommendation
+from .modules.dataset_processing.modules.src.mapper.mapper import Mapper
+from .modules.dataset_processing.modules.src.io.response.recommendationresponse import RecommendationResponse
+from .loader import Loader
+from .modules.batch.scheduler import Scheduler
 
-from modules.keras_learning.nn import NN, NNInput, NNOutput
+from .modules.keras_learning.io.nninput import NNInput
+from .modules.keras_learning.io.nnoutput import NNOutput
+from .modules.keras_learning.nn import NN
 import numpy as np
 import itertools
 
@@ -70,8 +73,15 @@ def getRecommendationResponseJSON(username):
 
 NN = Loader.loadNN()
 CACHED_USER_DIC, CACHED_M_USER_DIC = Loader.loadUsers() # By Nationalities
-CACHED_PRODUCT_DIC, CACHED_M_PRODUCT_DIC = Loader.loadProducts() # By Categories
+CACHED_PRODUCT_DIC, CACHED_M_PRODUCT_DIC = Loader.loadProducts(analytics=False) # By Categories
+loadProductsJob = (Loader.loadProducts, 3)
+ReloadNNJob = (Loader.reloadNN, 24)
+scheduler = Scheduler([loadProductsJob, ReloadNNJob])
+scheduler.start()
+#CACHED_RATING_DIC, CACHED_M_RATING_DIC = Loader.loadRatings() # By Categories
+#CACHED_SALES_DIC, CACHED_M_SALES_DIC = Loader.loadSales() # By Categories
 
 if __name__ == '__main__':
+    # Test
     user = CACHED_USER_DIC['ES'][0]
     json_s = getRecommendationResponseJSON(user._username)

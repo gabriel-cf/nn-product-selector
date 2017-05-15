@@ -1,16 +1,17 @@
 #!/usr/bin/python2.7
-from dataset_processing.modules.src.io.mongoconnector.mongohandler import MongoHandler
-from dataset_processing.modules.src.model.enum.sexenum import Sex
-from dataset_processing.modules.src.model.product import Product
-from dataset_processing.modules.src.model.user import User
-from dataset_processing.modules.src.model.mappeduser import MappedUser
-from dataset_processing.modules.src.model.mappedproduct import MappedProduct
-from dataset_processing.modules.src.model.scenario.scenariogenerator import ScenarioGenerator
-from dataset_processing.modules.src.model.scenario.rulegenerator import RuleGenerator
-from dataset_processing.modules.src.model.scenario.rule import Rule
-from dataset_processing.modules.src.mapper.mapper import Mapper
-
-from keras_learning.nn import NN, NNInput, NNOutput
+from .dataset_processing.modules.src.io.mongoconnector.mongohandler import MongoHandler
+from .dataset_processing.modules.src.model.enum.sexenum import Sex
+from .dataset_processing.modules.src.model.product import Product
+from .dataset_processing.modules.src.model.user import User
+from .dataset_processing.modules.src.model.mappeduser import MappedUser
+from .dataset_processing.modules.src.model.mappedproduct import MappedProduct
+from .dataset_processing.modules.src.model.scenario.scenariogenerator import ScenarioGenerator
+from .dataset_processing.modules.src.model.scenario.rulegenerator import RuleGenerator
+from .dataset_processing.modules.src.model.scenario.rule import Rule
+from .dataset_processing.modules.src.mapper.mapper import Mapper
+from .keras_learning.nn import NN
+from .keras_learning.io.nninput import NNInput
+from .keras_learning.io.nnoutput import NNOutput
 from datetime import date, datetime
 from random import randint
 import numpy as np
@@ -172,7 +173,7 @@ if __name__ == '__main__':
 		logger.debug("\033[32mMain CategoryM={};Avg RatingM={};No. PurchasesM={}\033[0m".format(mProduct._mainCategory, mProduct._avgRating, mProduct._noPurchases))
 	logger.info('Products mapped')
 
-	
+
 	logger.info('zipping lists')
 	mapped_user_product_list = zip(mappedUsers, mappedProducts)
 
@@ -188,12 +189,12 @@ if __name__ == '__main__':
 		rule = rule_dic[(user._nationality, product._mainCategory)]
 		if (i == 0):
 			logger.info("Using rule: %r" % rule)
-		
+
 		rule_prediction = rule.getEstimatedLikeValue(user, product)
 		nn_prediction = NNOutput.translatePredictionToDecimal(predictions[i])
 		logger.debug("User: Nationality={};Gender={};Age={} Product: Category={};Avg Rating={}".format(user._nationality, user._gender, user._age, product._mainCategory, product._avgRating))
 		logger.info("\033[32mRULE Like: %.6f%%\033[0m" % (rule_prediction * 100))
-		logger.info("\033[32mNN Like: %.6f%%\033[0m" % (nn_prediction * 100))		
+		logger.info("\033[32mNN Like: %.6f%%\033[0m" % (nn_prediction * 100))
 		logger.info("\033[33mDiff = %.6f%%\033[0m" % ((rule_prediction - nn_prediction) * 100))
 		logger.info("------------------------")
 		rPredictionPlot.append(rule_prediction)

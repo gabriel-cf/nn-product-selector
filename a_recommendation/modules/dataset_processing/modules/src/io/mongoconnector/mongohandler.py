@@ -10,6 +10,8 @@ class MongoHandler(object):
 		user application. Allows queries for users
 		and products to the DB
 	"""
+	# Change to False to load real values
+	MOCK_ANALYTICS = True
 	# Constants for defining connection parameters
 	HOST = 'localhost'
 	PORT = 27017
@@ -36,6 +38,33 @@ class MongoHandler(object):
 	def getAllProducts(self):
 		""" Returns all products on the DB"""
 		return self._productDB.products_collection.find()
+	def getAllRatings(self, sort=False, maxDate=None):
+		res = None
+		collection = self._analysisDB.ratings_collection if MongoHandler.MOCK_ANALYTICS\
+		 else self._analysisDB.ratings_collection_mock
+			#if maxDate: TODO
+			#	res = collection.find({"_date": {'$lt': maxDate}})
+			#else:
+		res = collection.find()
+		if sort:
+			return res.sort({"_date": -1})
+		return res
+	def getAllRules(self):
+		return self._analysisDB.rules_collection_mock.find()
+	def getRatingsForProduct(self, productId, maxDate=None):
+		""" Returns all ratings on the DB"""
+		if maxDate:
+			query = {"_productId": productId, "_date": {'$lt': maxDate}}
+		else:
+			query = {"_productId": productId}
+		if MongoHandler.MOCK_ANALYTICS:
+			return self._analysisDB.ratings_collection_mock.find(query)
+		return self._analysisDB.ratings_collection.find(query)
+
+	def getRuleForNationalityAndCategory(self, nationality, category):
+		# Note: it can only be in mock
+		query = {"_nationality":nationality, "_category":category}
+		return self._analysisDB.rules_collection_mock.find_one(query)
 
 	def getUsersByParameters(self, one_only=False, **parameters):
 		query_parameters = {}
@@ -64,11 +93,14 @@ class MongoHandler(object):
 				raise ValueError("Parameter '%s' is not a valid product query one" % (key))
 		# Return results
 		return self._productDB.products_collection.find(query_parameters)
-	
+
+	def getProductById(self, productId):
+		return self._productDB.products_collection.find_one({'_id': productId})
+
 	def __init__(self):
 		logging.info("Attempting connection with MongoDB service")
 		self._client = MongoClient(MongoHandler.HOST, MongoHandler.PORT) # Generate client and connect to service
 		logging.info("Connection established with MongoDB service")
-		self._userDB = self._client.tfg_users # Access point to Users DB 
+		self._userDB = self._client.tfg_users # Access point to Users DB
 		self._productDB = self._client.amazon_products # Access point to Amazon Products DB
-
+		self._analysisDB = self._client.analysis # Access point to Amazon Products DB

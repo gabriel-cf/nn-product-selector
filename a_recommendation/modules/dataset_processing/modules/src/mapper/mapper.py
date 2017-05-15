@@ -61,7 +61,7 @@ class Mapper(object):
 		except KeyError:
 			eprint("Provided Key '{0}' is not a valid key".format(key))
 		return value
-
+ 
 	@staticmethod
 	def getAllAvailableNationalities():
 		if (Mapper.nationality_mapper is None):

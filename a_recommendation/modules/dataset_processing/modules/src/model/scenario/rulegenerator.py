@@ -10,21 +10,17 @@ class RuleGenerator(object):
 		and creates Rule objects. Each weight can be understood as the relevance
 		that this parameter has for the final recomendation
 	"""
-	NUMBER_OF_PARAMETERS = 3 # user_age, user_sex, product_avg_rating
-	MAX_NORMALIZED_RATING = 1.0
+	# user_age, user_sex, product_avg_rating
+	NUMBER_OF_PARAMETERS = 3
 
 	@staticmethod
 	def generateRule():
-		""" Returns a new Rule object with all its weights randomly initialized following a Dirichlet
-			distribution and the MAX_NORMALIZED_RATING that a product can have
+		""" Returns a new Rule object with all its weights randomly initialized
+			following a Dirichlet distribution
 		"""
 		# Initialize random weights using Dirichlet distribution so they together sum up 1.0
 		random_weights = np.random.dirichlet(np.ones(RuleGenerator.NUMBER_OF_PARAMETERS), size=1)[0]
 		w_age, w_sex, w_avg_rating = random_weights #unpack weights
-		# Normalize values so each weight is hold in the interval [0.0, MAX_NORMALIZED_RATING]
-		w_age = w_age * RuleGenerator.MAX_NORMALIZED_RATING
-		w_sex = w_sex * RuleGenerator.MAX_NORMALIZED_RATING
-		w_avg_rating = w_avg_rating * RuleGenerator.MAX_NORMALIZED_RATING
 		# Subdivide sex weight into female and male weights
 		random_f_m_weights = np.random.dirichlet(np.ones(2), size=1)[0]
 		w_male, w_female = random_f_m_weights
@@ -37,5 +33,3 @@ class RuleGenerator(object):
 		rule = Rule(w_age, w_male, w_female, w_avg_rating, older_better)
 
 		return rule
-
-		

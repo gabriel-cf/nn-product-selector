@@ -32,18 +32,21 @@ class Rule(object):
 	def getEstimatedLikeValue(self, mapped_user, mapped_product):
 		w_sex = self._w_male if(mapped_user.getGenderValueFromMapped() == Sex.MALE) else self._w_female
 		# 0.0 <= Sum of weights <= Rule.MAX_RATING ; 0.0 <= normalized values <= Rule.MAX_NORMALIZED_VALUE
-		like = self._w_age * self.normalizeAge(mapped_user._age) + w_sex + self._w_avg_rating * self.normalizeAvgRating(mapped_product._avgRating)
+		like = self._w_age * self.normalizeAge(mapped_user._age)\
+			   + w_sex\
+			   + self._w_avg_rating * self.normalizeAvgRating(mapped_product._avgRating)
 		return like
 
 	def __repr__(self):
-		return "w_age=%.6f, w_male=%.6f, w_female=%.6f, w_avg_rating=%.6f, older_better=%r" % (self._w_age, self._w_male, self._w_female, self._w_avg_rating, self._older_better)
+		return "w_age=%.6f, w_male=%.6f, w_female=%.6f, w_avg_rating=%.6f, older_better=%r, fromDB=%s"\
+		% (self._w_age, self._w_male, self._w_female, self._w_avg_rating, self._older_better, self._fromDB)
 
-	def __init__(self, w_age, w_male, w_female, w_avg_rating, older_better):
+	def __init__(self, w_age, w_male, w_female, w_avg_rating, older_better, fromDB=False):
 		""" Intialize Rule object
 			w_age --> (float) user age weight
 			w_male --> (float) user male sex weight
 			w_female --> (float) user female sex weight
-			w_avg_rating --> (float) user average rating weight
+			w_avg_rating --> (float) product average rating weight
 			older_better --> (boolean) True = Yes / False = No
 		"""
 		self._w_age = w_age
@@ -51,4 +54,4 @@ class Rule(object):
 		self._w_female = w_female
 		self._w_avg_rating = w_avg_rating
 		self._older_better = older_better
-		
+		self._fromDB = fromDB
