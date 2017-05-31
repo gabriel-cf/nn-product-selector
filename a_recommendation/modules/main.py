@@ -97,10 +97,10 @@ def getProductsByCategoryFromDB(mongohandler):
 	return db_category_dic
 
 def mapUsers(processed_user_l):
-	return map(lambda x: MappedUser(x), processed_user_l)
+	return [MappedUser(x) for x in processed_user_l]
 
 def mapProducts(processed_product_l):
-	return map(lambda x: MappedProduct(x), processed_product_l)
+	return [MappedProduct(x) for x in processed_product_l]
 
 def processToMap(old_dic, func):
 	new_dic = {}
@@ -175,14 +175,14 @@ if __name__ == '__main__':
 
 
 	logger.info('zipping lists')
-	mapped_user_product_list = zip(mappedUsers, mappedProducts)
+	mapped_user_product_list = list(zip(mappedUsers, mappedProducts))
 
 	logger.info('Creating NNInput list')
 	inputSet = NNInput.getNNInputList(mapped_user_product_list)
 	logger.info('Getting predictions')
 	predictions = network.predict(inputSet)
 	i = 0
-	xAxis = np.array(range(0, len(mapped_user_product_list)))
+	xAxis = np.array(list(range(0, len(mapped_user_product_list))))
 	nPredictionPlot = []
 	rPredictionPlot = []
 	for user, product in mapped_user_product_list:

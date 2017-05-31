@@ -97,13 +97,13 @@ class Loader(object):
         """ Returns a dictionary holding the products for every category
             straight from the query result
         """
-        i = 0
+        #i = 0
         db_category_dic = {}
         for category_name in Mapper.getAllAvailableCategories():
-            if (i == 3):
-                break
+            #if (i == 3):
+            #    break
             db_category_dic[category_name] = MongoHandler.getInstance().getProductsByParameters(category=category_name)
-            i+=1
+            #i+=1
 
         return db_category_dic
 

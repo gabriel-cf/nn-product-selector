@@ -187,7 +187,7 @@ class CrawlerProducts(scrapy.Spider):
                             description_content = re.compile("\\n\s*").sub("", content_list[0]).encode("utf-8")
                             detailed_information[description_title.replace(".", "")] = description_content
 
-                keys = detailed_information.keys()
+                keys = list(detailed_information.keys())
 
                 if 'shipping_weight' in keys:
                     detailed_information['shipping_weight'] = detailed_information['shipping_weight'].replace("(", "").encode("utf-8")
@@ -218,7 +218,7 @@ class CrawlerProducts(scrapy.Spider):
                 try:
                     size_and_color = json.loads(re.search(re.compile("{.+}", re.MULTILINE), sel.css("[language~=JavaScript]::text")[0].extract()).group(0))['dimensionValuesDisplayData']
                     size_and_color_cleaned = {}
-                    for key in size_and_color.keys():
+                    for key in list(size_and_color.keys()):
                         size_and_color_cleaned[key.replace(".", "").encode("utf-8")] = [val.encode("utf-8") for val in size_and_color[key]]
                 except:
                     size_and_color_cleaned = {}
@@ -264,7 +264,7 @@ class CrawlerProducts(scrapy.Spider):
 
                 import traceback
                 list = traceback.format_exc().splitlines()
-                print list
+                print(list)
                 limit = len(list)
                 error = list[limit - 3].replace("\"", "")
 

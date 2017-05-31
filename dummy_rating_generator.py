@@ -5,7 +5,7 @@
     Ratings will be loaded to ratings_collection_mock
 """
 
-from __future__ import division
+
 import random
 import time
 from .a_recommendation.modules.dataset_processing.modules.src.io.mongoconnector.mongohandler import MongoHandler
@@ -91,17 +91,17 @@ if __name__ == '__main__':
     # The number of users and products is limited by the constant dMAX in loader.py
     count = 0
     #random_weights = np.random.dirichlet(np.ones(len(users_dic.keys())), size=1)[0]
-    for nationality, users in users_dic.iteritems():
-        print nationality
-        for i in xrange(0, len(users)):
+    for nationality, users in users_dic.items():
+        print(nationality)
+        for i in range(0, len(users)):
             if randomTrue():
                 continue
             user = users[i]
             m_user = users_m_dic[nationality][i]
-            for category, products in products_dic.iteritems():
+            for category, products in products_dic.items():
                 if randomTrue():
                     continue
-                for j in xrange(0, len(products)):
+                for j in range(0, len(products)):
                     if randomTrue():
                         continue
                     product = products[j]
@@ -109,7 +109,7 @@ if __name__ == '__main__':
                     estimated_rating = rule.getEstimatedLikeValue(m_user, m_product)
                     insertRatingAndSale(user, product, estimated_rating)
                     count += 1
-    print count
-    print "Creating indexes for _productId and _userId"
+    print(count)
+    print("Creating indexes for _productId and _userId")
     handler._analysisDB.ratings_collection_mock.create_index([('_productId', 1)])
     handler._analysisDB.ratings_collection_mock.create_index([('_userId', 1)])

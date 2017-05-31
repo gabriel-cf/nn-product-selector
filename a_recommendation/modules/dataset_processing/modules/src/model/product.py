@@ -1,4 +1,4 @@
-from __future__ import division
+
 from random import uniform
 
 class Product(object):

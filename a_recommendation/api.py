@@ -25,8 +25,10 @@ def getRecommendationsByCategory(m_user, max_results=5):
         rule = NN.getRule(m_user._nationality, m_category)
         logger.info("Using rule: %r", rule)
         # Cartesian product of Nationalities and Categories
+        # Note that itertools.product returns a generator
+        if not CACHED_M_PRODUCT_DIC[category]:
+            continue      
         combinations = itertools.product([m_user], CACHED_M_PRODUCT_DIC[category])
-
         recommendations = []
         inputSet = NNInput.getNNInputList(combinations)
         logger.info('Getting predictions')

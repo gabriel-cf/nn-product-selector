@@ -66,13 +66,13 @@ class Mapper(object):
 	def getAllAvailableNationalities():
 		if (Mapper.nationality_mapper is None):
 			Mapper.updateMappers()
-		return Mapper.nationality_mapper.keys()
+		return list(Mapper.nationality_mapper.keys())
 
 	@staticmethod
 	def getAllAvailableCategories():
 		if (Mapper.category_mapper is None):
 			Mapper.updateMappers()
-		return Mapper.category_mapper.keys()
+		return list(Mapper.category_mapper.keys())
 
 	# TODO - Move these mocked functions to a separate mock class
 	### Mocked functions ###
@@ -81,14 +81,14 @@ class Mapper(object):
 		"""Will return a subset of two nationalities"""
 		if (Mapper.nationality_mapper is None):
 			Mapper.updateMappers()
-		return Mapper.nationality_mapper.keys()[:1]
+		return list(Mapper.nationality_mapper.keys())[:1]
 
 	@staticmethod
 	def getAllAvailableCategoriesMock():
 		"""Will return a subset of three categories"""
 		if (Mapper.category_mapper is None):
 			Mapper.updateMappers()
-		return Mapper.category_mapper.keys()[:1]
+		return list(Mapper.category_mapper.keys())[:1]
 	###
 
 	@staticmethod

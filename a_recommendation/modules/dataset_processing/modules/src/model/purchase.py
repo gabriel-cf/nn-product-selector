@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from product import Product
+from .product import Product
 from numbers import Number
 
 class Purchase(object):

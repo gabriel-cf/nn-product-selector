@@ -41,7 +41,7 @@ class NNOutput(object):
 	def translatePredictionListToDecimalList(nnOutputValue_l):
 		if (nnOutputValue_l is None):
 			raise ValueError('nnOutputValue_l must be a list of decimal NN outputs non None')
-		return np.array(map(lambda x: x[0], nnOutputValue_l))
+		return np.array([x[0] for x in nnOutputValue_l])
 
 	def __init__(self, outputValue):
 		self._value = NNOutput.getNNOutput(outputValue)

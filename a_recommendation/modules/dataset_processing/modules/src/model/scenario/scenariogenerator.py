@@ -1,7 +1,7 @@
-from __future__ import division
+
 import itertools
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
+from datetime import datetime, timedelta
+#from dateutil.relativedelta import relativedelta
 from ...mapper.mapper import Mapper
 from ..user import User
 from ..product import Product
@@ -9,8 +9,8 @@ from ..mappeduser import MappedUser
 from ..mappedproduct import MappedProduct
 from ..enum.sexenum import Sex
 from ......keras_learning.io.nntraininginputset import NNTrainingInputSet
-from rule import Rule
-from rulegenerator import RuleGenerator
+from .rule import Rule
+from .rulegenerator import RuleGenerator
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -38,7 +38,7 @@ class ScenarioGenerator:
 	def getDummyUser(nationality, index, male=True):
 		gender = Sex.MALE if male else Sex.FEMALE
 		name = "".join(["dummy_user_", "%i" % index, "_", gender])
-		age = datetime.now() - relativedelta(years=(ScenarioGenerator.MIN_AGE + index * ScenarioGenerator.AGE_GAP))
+		age = datetime.now() - timedelta(days=365*(ScenarioGenerator.MIN_AGE + index))#- relativedelta(years=(ScenarioGenerator.MIN_AGE + index * ScenarioGenerator.AGE_GAP))
 		nationality = nationality
 		user = User(name, gender, age, nationality)
 		return user
@@ -54,28 +54,28 @@ class ScenarioGenerator:
 		return product
 
 	@staticmethod
-	def getDummyUsersProductsRule(rules=None):
+	def getDummyUsersProductsRule(rule_dic=None):
 		combinations = itertools.product(ScenarioGenerator.ALL_NATIONALITIES, ScenarioGenerator.ALL_CATEGORIES) # Cartesian product of Nationalities and Categories
 		dummy_combinations = [] # --> [(dummyusers0x0, dummyproducts0x0, rule0x0), (dummyusers0x1, dummyproducts0x1, rule0x1) .. , ((natnxcatk dummyusers, natnxcatk dummyproducts))]
 		for nationality, category in combinations:
 			rule = None
-			if not rules:
+			if not rule_dic:
 				# Generate rule
 				rule = RuleGenerator.generateRule()
 			else:
-				print nationality
-				print Mapper.getNationalityValue(nationality)
-				print category
-				print Mapper.getCategoryValue(category)
-				rule = rules[(Mapper.getNationalityValue(nationality), Mapper.getCategoryValue(category))]
+				print(nationality)
+				print(Mapper.getNationalityValue(nationality))
+				print(category)
+				print(Mapper.getCategoryValue(category))
+				rule = rule_dic[(Mapper.getNationalityValue(nationality), Mapper.getCategoryValue(category))]
 			# Generate dummy users
 			dummy_user_l = []
-			for sex in xrange(0,2):
-				for i in xrange(0, ScenarioGenerator.MAX_DUMMY_USERS + 1):
+			for sex in range(0,2):
+				for i in range(0, ScenarioGenerator.MAX_DUMMY_USERS + 1):
 					dummy_user_l.append(ScenarioGenerator.getDummyUser(nationality, i, male=(sex==0)))
 			# Generate dummy products
 			dummy_product_l = []
-			for i in xrange(0, ScenarioGenerator.MAX_DUMMY_PRODUCTS + 1):
+			for i in range(0, ScenarioGenerator.MAX_DUMMY_PRODUCTS + 1):
 				dummy_product_l.append(ScenarioGenerator.getDummyProduct(category, i))
 
 			dummy_combinations.append((dummy_user_l, dummy_product_l, rule))
@@ -83,17 +83,17 @@ class ScenarioGenerator:
 
 	@staticmethod
 	def generateTrainingInputSet(rules=None):
-		dummy_combinations = ScenarioGenerator.getDummyUsersProductsRule(rules=rules)
+		dummy_combinations = ScenarioGenerator.getDummyUsersProductsRule(rule_dic=rules)
 		nnTrainingInputSet = NNTrainingInputSet()
 		# For each combination of users and products under a given rule
 		no_combinations = len(dummy_combinations)
 		rule_dic = {}
-
+		if rules:
+			rule_dic = rules
 		i = 0
 		for users, products, rule in dummy_combinations:
 			# Map rule for the given combination nationalityXcategory
-			if not rules:
-				rule_dic[(MappedUser(users[0])._nationality, MappedProduct(products[0])._mainCategory)] = rule
+			rule_dic[(MappedUser(users[0])._nationality, MappedProduct(products[0])._mainCategory)] = rule
 			# Combine every user with all products
 			combinations = itertools.product(users, products)
 			for user, product in combinations:
@@ -103,5 +103,5 @@ class ScenarioGenerator:
 				nnTrainingInputSet.addToTrainingInput(mapped_user, mapped_product, expected_like)
 			i += 1
 			logger.info("Finished combination %s of %s" % (i, no_combinations))
-		nnTrainingInputSet._rule_dic = rules
+		nnTrainingInputSet._rule_dic = rule_dic
 		return nnTrainingInputSet

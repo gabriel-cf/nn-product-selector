@@ -20,6 +20,6 @@ with open("general_product_categories.csv", 'rb') as csvfile:
 	spamreader = csv.reader(csvfile, delimiter=';')
 	for row in spamreader:
 		for categoryName in row:
-			print json.dumps(Category(categoryName), cls=CategoryEncoder)
+			print(json.dumps(Category(categoryName), cls=CategoryEncoder))
 
 	

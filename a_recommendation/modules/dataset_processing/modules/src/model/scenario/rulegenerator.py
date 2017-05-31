@@ -1,4 +1,4 @@
-from rule import Rule
+from .rule import Rule
 import numpy as np
 
 import logging

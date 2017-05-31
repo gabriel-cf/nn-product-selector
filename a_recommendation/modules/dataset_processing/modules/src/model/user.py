@@ -1,6 +1,6 @@
 from datetime import date, datetime
-from purchase import Purchase
-from enum.sexenum import Sex
+from .purchase import Purchase
+from .enum.sexenum import Sex
 
 class User(object):
 	""" User object for storing data retrieved from the DB """

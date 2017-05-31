@@ -6,6 +6,6 @@ users = db.users_collection.find()
 
 for user in users:
 	#print(user)
-	print("{};{}".format(user['nat'], user['login']['username']))
+	print(("{};{}".format(user['nat'], user['login']['username'])))
 
 

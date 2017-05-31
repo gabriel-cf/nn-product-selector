@@ -26,12 +26,12 @@ model.fit(X, Y, nb_epoch=50, batch_size=10)
 
 # evaluate the model
 scores = model.evaluate(X, Y)
-print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+print(("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100)))
 
 print("###############")
 
 X = numpy.array([dataset[0, 0:3]])
 
-print(model.predict(X))
+print((model.predict(X)))
 
  

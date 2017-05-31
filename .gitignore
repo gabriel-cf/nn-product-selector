@@ -10,3 +10,4 @@ example/
 connect.sh  
 pair.pem  
 *.bson 
+nohup.out
