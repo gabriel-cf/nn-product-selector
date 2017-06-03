@@ -171,7 +171,7 @@ class Loader(object):
         for rule in rules:
             Loader.CACHED_RULES_DIC[(Mapper.getNationalityValue(rule['_nationality']),\
             Mapper.getCategoryValue(rule['_category']))]\
-            = Rule(rule['_w_age'], rule['_w_male'], rule['_w_female'], rule['_w_avg_rating'], rule['_older_better'], fromDB=True)
+            = Rule(rule['_w_age'], rule['_w_male'], rule['_w_female'], rule['_w_avg_rating'], rule['_older_better'])
 
     @staticmethod
     def loadNN(load_rules=True):

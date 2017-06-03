@@ -38,10 +38,10 @@ class Rule(object):
 		return like
 
 	def __repr__(self):
-		return "w_age=%.6f, w_male=%.6f, w_female=%.6f, w_avg_rating=%.6f, older_better=%r, fromDB=%s"\
-		% (self._w_age, self._w_male, self._w_female, self._w_avg_rating, self._older_better, self._fromDB)
+		return "w_age=%.6f, w_male=%.6f, w_female=%.6f, w_avg_rating=%.6f, older_better=%r"\
+		% (self._w_age, self._w_male, self._w_female, self._w_avg_rating, self._older_better)
 
-	def __init__(self, w_age, w_male, w_female, w_avg_rating, older_better, fromDB=False):
+	def __init__(self, w_age, w_male, w_female, w_avg_rating, older_better):
 		""" Intialize Rule object
 			w_age --> (float) user age weight
 			w_male --> (float) user male sex weight
@@ -54,4 +54,3 @@ class Rule(object):
 		self._w_female = w_female
 		self._w_avg_rating = w_avg_rating
 		self._older_better = older_better
-		self._fromDB = fromDB

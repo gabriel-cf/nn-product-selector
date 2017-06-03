@@ -120,7 +120,6 @@ def processProductsFromDBResult(db_product_dic):
 def mapProcessedProducts(processed_product_dic):
 	return processToMap(processed_product_dic, mapProducts)
 
-
 if __name__ == '__main__':
 	logger.info('Generating random scenario')
 	nnTrainingInputSet, rule_dic = ScenarioGenerator.generateTrainingInputSet()
