@@ -2,7 +2,7 @@ import os
 import json
 from ..util.utils import eprint # Print to STDERR
 from ..model.enum.sexenum import Sex
-from ....definitions import MAPPER_NATIONALITY_FILE, MAPPER_CATEGORY_FILE
+from ....settings_loader import SettingsLoader
 
 
 class Mapper(object):
@@ -10,8 +10,8 @@ class Mapper(object):
 		and category values
 	"""
 	# Constants
-	NATIONALITY_MAPPER_FILE = MAPPER_NATIONALITY_FILE # From definitions.py
-	CATEGORY_MAPPER_FILE = MAPPER_CATEGORY_FILE
+	NATIONALITY_MAPPER_FILE = SettingsLoader.getPath('NATIONALITY_MAPPER_FILE')
+	CATEGORY_MAPPER_FILE = SettingsLoader.getPath('CATEGORY_MAPPER_FILE')
 	NATIONALITY_MAPPER_ID = "nationality_mapper"
 	CATEGORY_MAPPER_ID = "category_mapper"
 

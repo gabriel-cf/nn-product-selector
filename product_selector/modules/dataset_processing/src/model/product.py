@@ -14,6 +14,9 @@ class Product(object):
 		self._noRatings = max(len(ratingList), 1)
 		self._avgRating = sum(ratingList) / self._noRatings
 
+	def getCategory(self):
+		return self._mainCategory	
+
 	def __init__(self, prodID, name, categories, imageURL, avgRating = 0.0):
 		self._id = prodID
 		self._name = name

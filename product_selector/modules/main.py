@@ -127,7 +127,7 @@ if __name__ == '__main__':
 
 	logger.info('Executing Neural Input Generator')
 	logger.info('Loading Neural Network')
-	network = NN.getInstance(loadDataFromDefaultFile=False)
+	network = NN.getInstance()
 	logger.info('Setting Training Input')
 	network.setTrainingInput(nnTrainingInputSet)
 	logger.info('Training Network')

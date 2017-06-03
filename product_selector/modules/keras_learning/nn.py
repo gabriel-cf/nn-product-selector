@@ -1,5 +1,4 @@
 from keras.models import Sequential
-from ..definitions import NN_TRAINING_FILE
 from ..dataset_processing.src.model.scenario.scenariogenerator import ScenarioGenerator
 from .io.nntraininginputset import NNTrainingInputSet
 
@@ -19,34 +18,31 @@ class NN(object):
     NN_OUTPUTS = 1 # {like_probability}
     NN_DEFAULT_EPOCHS = 1
     NN_DEFAULT_BATCH_SIZE = 500
-    NN_DEFAULT_TRAINING_FILE = NN_TRAINING_FILE # From definitions.py
     NETWORK = None # Neural Network built upon a Keras model
     ## Class random init ##
     #np.random.seed(SEED)
     RLOCK = RLock()
 
     @staticmethod
-    def instantiateNN(trainingInputSet=None, loadDataFromDefaultFile=False, rules=None):
+    def instantiateNN(trainingInputSet=None, rules=None):
         """Returns a newly created NN object, trained if rules are specified
         """
         network = NN()
         network.createModel()
         if trainingInputSet:
             network.setTrainingInputSet(trainingInputSet)
-        elif loadDataFromDefaultFile:
-            network.loadTrainingDataFromFile(NN.NN_DEFAULT_TRAINING_FILE)
         elif rules:
             network.trainWithRandomScenario(rules=rules)
         return network
 
     @staticmethod
-    def getInstance(loadDataFromDefaultFile=False, rules=False):
+    def getInstance(rules=False):
         """ Singleton method to get the only instance
         """
         if (NN.NETWORK is None):
             NN.RLOCK.acquire()
             if (NN.NETWORK is None):
-                NN.NETWORK = NN.instantiateNN(loadDataFromDefaultFile=loadDataFromDefaultFile, rules=rules)
+                NN.NETWORK = NN.instantiateNN(rules=rules)
             NN.RLOCK.release()
         return NN.NETWORK
 
@@ -83,16 +79,6 @@ class NN(object):
 
     def trainWithRealData(self):
         pass
-
-    def loadTrainingDataFromFile(self, file_path, delim=';'):
-        NN.RLOCK.acquire()
-        # Load dataset
-        dataset = np.loadtxt(file_path, delimiter=delim)
-        # Split into input (X) and output (Y) variables
-        t_input = dataset[:,0:NN.NN_INPUTS]
-        t_output = dataset[:,NN.NN_INPUTS]
-        self._traningInputSet = NNTrainingInputSet(t_input, t_output)
-        NN.RLOCK.release()
 
     def createModel(self):
         NN.RLOCK.acquire()
