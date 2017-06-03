@@ -1,4 +1,4 @@
-from .a_recommendation.modules.dataset_processing.modules.src.io.mongoconnector.mongohandler import MongoHandler
+from .product_selector.modules.dataset_processing.src.io.mongoconnector.mongohandler import MongoHandler
 
 if __name__ == '__main__':
     handler = MongoHandler.getInstance()

@@ -8,10 +8,10 @@
 
 import random
 import time
-from .a_recommendation.modules.dataset_processing.modules.src.io.mongoconnector.mongohandler import MongoHandler
-from .a_recommendation.modules.dataset_processing.modules.src.model.scenario.scenariogenerator import ScenarioGenerator
-from .a_recommendation.modules.dataset_processing.modules.src.mapper.mapper import Mapper
-from .a_recommendation.loader import Loader
+from .product_selector.modules.dataset_processing.src.io.mongoconnector.mongohandler import MongoHandler
+from .product_selector.modules.dataset_processing.src.model.scenario.scenariogenerator import ScenarioGenerator
+from .product_selector.modules.dataset_processing.src.mapper.mapper import Mapper
+from .product_selector.loader import Loader
 
 handler = MongoHandler.getInstance()
 MAX_DAYS = 30
