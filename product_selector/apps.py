@@ -6,6 +6,6 @@ class MyAppConfig(AppConfig):
     def ready(self):
     	Loader.loadNN()
     	#Loader.loadUsers()
-    	Loader.loadProducts(analytics=False)
+    	#Loader.loadProducts(analytics=False)
         #Loader.loadRatings()
         #Loader.loadSales()

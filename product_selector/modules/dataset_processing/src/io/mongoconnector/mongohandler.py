@@ -20,9 +20,11 @@ class MongoHandler(object):
 	Q_USER_SEX = 'gender'
 	Q_USER_USERNAME = 'login.username'
 	Q_PRODUCT_CATEGORY = 'sections'
+	Q_PRODUCT_ID = '_id'
 	KWARG_NATIONALITY = 'nationality'
 	KWARG_SEX = 'sex'
 	KWARG_CATEGORY = 'category'
+	KWARG_ID = 'id'
 	KWARG_USERNAME = 'username'
 	INSTANCE = None
 
@@ -37,7 +39,7 @@ class MongoHandler(object):
 		return self._userDB.users_collection.find()
 	def getAllProducts(self):
 		""" Returns all products on the DB"""
-		return self._productDB.products_collection.find()
+		return self._productDB.products_collection.find().limit(1000)
 	def getAllRatings(self, sort=False, maxDate=None):
 		res = None
 		collection = self._analysisDB.ratings_collection if MongoHandler.MOCK_ANALYTICS\
@@ -89,6 +91,8 @@ class MongoHandler(object):
 		for key in parameters:
 			if (key == MongoHandler.KWARG_CATEGORY):
 				query_parameters[MongoHandler.Q_PRODUCT_CATEGORY] = parameters[MongoHandler.KWARG_CATEGORY]
+			elif (key == MongoHandler.KWARG_ID):
+				query_parameters[MongoHandler.Q_PRODUCT_ID] = parameters[MongoHandler.KWARG_ID]
 			else:
 				raise ValueError("Parameter '%s' is not a valid product query one" % (key))
 		# Return results

@@ -8,6 +8,7 @@ from ..product import Product
 from ..mappeduser import MappedUser
 from ..mappedproduct import MappedProduct
 from ..enum.sexenum import Sex
+from ..rating import Rating
 from .....keras_learning.io.nntraininginputset import NNTrainingInputSet
 from .rule import Rule
 from .rulegenerator import RuleGenerator
@@ -100,7 +101,7 @@ class ScenarioGenerator:
 				mapped_user = MappedUser(user)
 				mapped_product = MappedProduct(product)
 				expected_like = rule.getEstimatedLikeValue(mapped_user, mapped_product)
-				nnTrainingInputSet.addToTrainingInput(mapped_user, mapped_product, expected_like)
+				nnTrainingInputSet.addRatingToTrainingInput(Rating(mapped_user, mapped_product, expected_like))
 			i += 1
 			logger.info("Finished combination %s of %s" % (i, no_combinations))
 		nnTrainingInputSet._rule_dic = rule_dic

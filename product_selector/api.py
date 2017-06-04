@@ -11,6 +11,7 @@ from .modules.task_scheduler.scheduler import Scheduler
 from .modules.keras_learning.io.nninput import NNInput
 from .modules.keras_learning.io.nnoutput import NNOutput
 from .modules.keras_learning.nn import NN
+from .modules.recommender_engine.recommender_engine import RecommenderEngine
 import numpy as np
 import itertools
 
@@ -57,28 +58,29 @@ def getRecommendationResponseJSON(username):
     """    Receives a dictionary with the recommended categories and products
         and generates the JSON
     """
-    user_db = MongoHandler.getInstance().getUsersByParameters(one_only=True, username=username)
-    if (user_db is None):
-        logger.warning("No users were found for username '%s'" % username)
-        return None
-    user = Loader.getUsersFromDBResult([user_db])[0]
-    category_recommendations = getRecommendationsByCategory(MappedUser(user))
-    category_l = []
-    for category_name in category_recommendations:
-        category_l.append(Category(category_name, category_recommendations[category_name]))
-    recommendation = Recommendation(category_l)
-
+    recommendations = RecommenderEngine.getRecommendationsForUser(username)
+    #user_db = MongoHandler.getInstance().getUsersByParameters(one_only=True, username=username)
+    #if (user_db is None):
+    #    logger.warning("No users were found for username '%s'" % username)
+    #    return None
+    #user = Loader.getUsersFromDBResult([user_db])[0]
+    #category_recommendations = getRecommendationsByCategory(MappedUser(user))
+    #category_l = []
+    #for category_name in category_recommendations:
+    #    category_l.append(Category(category_name, category_recommendations[category_name]))
+    #recommendation = Recommendation(category_l)
+    return None
     json_o = RecommendationResponse.getJSON(recommendation)
     logger.debug(json_o)
 
     return json_o
 
 NN = Loader.loadNN()
-CACHED_USER_DIC, CACHED_M_USER_DIC = Loader.loadUsers() # By Nationalities
-CACHED_PRODUCT_DIC, CACHED_M_PRODUCT_DIC = Loader.loadProducts(analytics=False) # By Categories
-loadProductsJob = (Loader.loadProducts, 3)
+#CACHED_USER_DIC, CACHED_M_USER_DIC = Loader.loadUsers() # By Nationalities
+#CACHED_PRODUCT_DIC, CACHED_M_PRODUCT_DIC = Loader.loadProducts(analytics=False) # By Categories
+#loadProductsJob = (Loader.loadProducts, 3)
 ReloadNNJob = (Loader.reloadNN, 24)
-scheduler = Scheduler([loadProductsJob, ReloadNNJob])
+scheduler = Scheduler([ReloadNNJob])
 scheduler.start()
 #CACHED_RATING_DIC, CACHED_M_RATING_DIC = Loader.loadRatings() # By Categories
 #CACHED_SALES_DIC, CACHED_M_SALES_DIC = Loader.loadSales() # By Categories

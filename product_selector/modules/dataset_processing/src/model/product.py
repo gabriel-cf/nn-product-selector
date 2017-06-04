@@ -15,7 +15,10 @@ class Product(object):
 		self._avgRating = sum(ratingList) / self._noRatings
 
 	def getCategory(self):
-		return self._mainCategory	
+		return self._mainCategory
+
+	def hasCategory(self):
+		return not self._mainCategory is None
 
 	def __init__(self, prodID, name, categories, imageURL, avgRating = 0.0):
 		self._id = prodID

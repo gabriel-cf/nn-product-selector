@@ -5,11 +5,13 @@ from .modules.dataset_processing.src.model.product import Product
 from .modules.dataset_processing.src.model.user import User
 from .modules.dataset_processing.src.model.mappeduser import MappedUser
 from .modules.dataset_processing.src.model.mappedproduct import MappedProduct
+from .modules.dataset_processing.src.mapper.dbmapper import DBMapper
 from .modules.dataset_processing.src.mapper.mapper import Mapper
 from .modules.dataset_processing.src.model.scenario.rule import Rule
 
 from .modules.keras_learning.nn import NN
 from datetime import datetime
+import time
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -37,16 +39,18 @@ class Loader(object):
         for db_user in db_users:
             if (i == dMAX):
                 break
-            # Retrieve username, gender, age and nationality
-            username = db_user['login']['username']
-            gender = db_user['gender']
-            dateOfBirth = db_user['dob'] #yyyy-mm-dd
-            nationality = db_user['nat']
-            # Transform string date to date object
-            dateOfBirth = datetime.strptime(dateOfBirth.split(' ')[0], '%Y-%m-%d')
-            #logger.debug("{};{};{};{}".format(username, gender, dateOfBirth.year, nationality))
-            user = User(username, gender, dateOfBirth, nationality)
-            retrievedUsers.append(user)
+            user = DBMapper.fromDBResultToUser(db_user)
+            if user:
+                retrievedUsers.append(user)
+            ## Retrieve username, gender, age and nationality
+            #username = db_user['login']['username']
+            #gender = db_user['gender']
+            #dateOfBirth = db_user['dob'] #yyyy-mm-dd
+            #nationality = db_user['nat']
+            ## Transform string date to date object
+            #dateOfBirth = datetime.strptime(dateOfBirth.split(' ')[0], '%Y-%m-%d')
+            ##logger.debug("{};{};{};{}".format(username, gender, dateOfBirth.year, nationality))
+            #user = User(username, gender, dateOfBirth, nationality)
             i+=1
         logger.info('Users processed')
 
@@ -62,20 +66,51 @@ class Loader(object):
         for db_product in db_products:
             if (i == dMAX):
                 break
-            idP = db_product['_id']
-            name = db_product['name']
-            categories = db_product['sections']
-            imageUrl = db_product['image_url']
-            if (categories):
-                product = Product(idP, name, categories, imageUrl)
-                if Loader.ANALYTICS:
-                    # Set Ratings
-                    db_ratings = MongoHandler.getInstance().getRatingsForProduct(idP)
-                    product.setRating([db_rating['_rating'] for db_rating in db_ratings])
-                else:
-                    product.setRandomRating()
-                logger.debug("prod_id:{}, avg_rating:{}".format(product._id, product._avgRating))
-                retrievedProducts.append(product)
+            product = DBMapper.fromDBResultToProduct(db_product)
+            # TODO - Set Rating
+            pipeline = [
+                {"$group":
+                    {
+                    "_id": {"user": "$_userId", "product": "$_productId"},
+                    "totalSum": {"$sum": "$_productRating"},
+                    "avgSum": {"$avg": "$_productRating"},
+                    "count": {"$sum": 1}
+                    }
+                }
+            ]
+            ini = time.time()
+            handler = MongoHandler.getInstance()
+            for product_rating in handler._analysisDB.ratings_collection_mock.aggregate(pipeline):
+                #print("doing something")
+                _id = product_rating['_id']['product']
+                handler._productDB.products_collection.find_one({"_id": _id})
+            fini = time.time()
+            print(fini - ini)
+            #handler._productDB.ProductData.update_one({
+            #  '_id': p['_id']
+            #},{
+            #  '$set': {
+            #    'd.a': existing + 1
+            #  }
+            #}, upsert=False)
+            #db_ratings = MongoHandler.getInstance().getRatingsForProduct(product._id)
+            #product.setRating([db_rating['_rating'] for db_rating in db_ratings])
+            #product.setRandomRating()
+            #retrievedProducts.append(product)
+            #idP = db_product['_id']
+            #name = db_product['name']
+            #categories = db_product['sections']
+            #imageUrl = db_product['image_url']
+            #if (categories):
+            #    product = Product(idP, name, categories, imageUrl)
+            #    if Loader.ANALYTICS:
+            #        # Set Ratings
+            #        db_ratings = MongoHandler.getInstance().getRatingsForProduct(idP)
+            #        product.setRating([db_rating['_rating'] for db_rating in db_ratings])
+            #    else:
+            #        product.setRandomRating()
+            #    logger.debug("prod_id:{}, avg_rating:{}".format(product._id, product._avgRating))
+            #    retrievedProducts.append(product)
             i+=1
         logger.info('Products processed')
 

@@ -3,6 +3,6 @@
   "USER_PRODUCT_TRAINING_FILE":"keras_learning/resources/test_data/user_product.csv",
   "NATIONALITY_MAPPER_FILE":"dataset_processing/config/mapper/nationality_mapper.json",
   "CATEGORY_MAPPER_FILE":"dataset_processing/config/mapper/category_mapper.json",
-  "RECOMMENDATION_MAX_CATEGORIES":3,
-  "RECOMMENDATION_MAX_PRODUCTS_PER_CATEGORY":10
+  "MAX_CATEGORIES":3,
+  "MAX_PRODUCTS_PER_CATEGORY":10
 }
