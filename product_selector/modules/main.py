@@ -177,7 +177,7 @@ if __name__ == '__main__':
 	mapped_user_product_list = list(zip(mappedUsers, mappedProducts))
 
 	logger.info('Creating NNInput list')
-	inputSet = NNInput.getNNInputList(mapped_user_product_list)
+	inputSet = NNInput.getNNValuesList(mapped_user_product_list)
 	logger.info('Getting predictions')
 	predictions = network.predict(inputSet)
 	i = 0

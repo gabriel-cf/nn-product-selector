@@ -30,13 +30,15 @@ class User(object):
 			self._purchases.append(purchase)
 		else:
 			raise TypeError('purchase object must be of type Purchase')
-		
+
+	def getName(self):
+		return self._username
 
 	def __init__(self, username, gender, birthDay, nationality, purchases = []):
 		""" username : String
 			gender : String "M[ALE]" | "F[EMALE]" lower case allowed
 			birthDay : Date
-			nationality : String 
+			nationality : String
 			purchases : Purchase[]
 		"""
 		self._username = username
@@ -45,4 +47,3 @@ class User(object):
 		self._nationality = nationality
 		self._ageGroup = self.getAgeGroup()
 		self._purchases = purchases
-

@@ -17,9 +17,9 @@ class NNTrainingInputSet(object):
         self._nnoutputset.add(ratingValue)
 
     def getInput(self):
-        return self._nninputset.getValues()
+        return self._nninputset.getNNValues()
     def getOutput(self):
-        return self._nnoutputset.getValues()
+        return self._nnoutputset.getNNValues()
 
     def __init__(self, x=None, y=None, rule_dic=None):
         """ x --> numpy.array([]) holding input values

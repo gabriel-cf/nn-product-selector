@@ -11,7 +11,7 @@ class NNInput(object):
 		and a product into a format understandable by the NN
 	"""
 	@staticmethod
-	def getNNInput(mapped_user, mapped_product, only_entry=False):
+	def getNNValues(mapped_user, mapped_product, only_entry=False):
 		""" mapped_user --> MappedUser object
 		 	mapped_product --> MappedProduct object
 		 	only_entry (default=False) --> Return only the input entry of the numpy array
@@ -34,14 +34,14 @@ class NNInput(object):
 		return t_X
 
 	@staticmethod
-	def getNNInputList(mapped_user_product_tuple_list):
+	def getNNValuesList(mapped_user_product_tuple_list):
 		""" Takes a list of tuples (mapped_user, mapped_product)
 			and returns a list of inputs ready to be processed by the NN
 		"""
 		t_X = []
 		for user, product in mapped_user_product_tuple_list:
-			t_X.append(NNInput.getNNInput(user, product, only_entry=True))
+			t_X.append(NNInput.getNNValues(user, product, only_entry=True))
 		return np.array(t_X)
 
 	def __init__(self, mapped_user, mapped_product):
-		self._value = NNInput.getNNInput(mapped_user, mapped_product)
+		self._value = NNInput.getNNValues(mapped_user, mapped_product)

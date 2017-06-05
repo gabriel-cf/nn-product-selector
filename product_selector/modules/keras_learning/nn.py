@@ -12,27 +12,18 @@ logger = logging.getLogger(__name__)
 class NN(object):
     """ Neural network class (Thread-safe) """
 
-    ## Constants ##
-    #SEED = 7
     NN_INPUTS = 5 # {user_nationality_mapped, user_sex_mapped, user_age, product_category_mapped, product_avg_rating}
     NN_OUTPUTS = 1 # {like_probability}
     NN_DEFAULT_EPOCHS = 1
     NN_DEFAULT_BATCH_SIZE = 500
     NETWORK = None # Neural Network built upon a Keras model
-    ## Class random init ##
-    #np.random.seed(SEED)
     RLOCK = RLock()
 
     @staticmethod
     def instantiateNN(trainingInputSet=None, rules=None):
-        """Returns a newly created NN object, trained if rules are specified
-        """
-        network = NN()
+        """Returns a newly created NN object"""
+        network = NN(trainingInputSet=trainingInputSet, rules=rules)
         network.createModel()
-        if trainingInputSet:
-            network.setTrainingInputSet(trainingInputSet)
-        elif rules:
-            network.trainWithRandomScenario(rules=rules)
         return network
 
     @staticmethod
@@ -55,13 +46,18 @@ class NN(object):
         NN.RLOCK.release()
 
     @staticmethod
-    def trainNewInstance(realData=False, rules=None):
-        newNetwork = NN.instantiateNN(rules=rules)
+    def trainNewInstance(trainingInputSet=None, rules=None):
+        if not trainingInputSet and not NN.NETWORK:
+            logger.error("Cannot train NN without a specified trainingInputSet\
+                         or an existing previous one")
+        if NN.NETWORK:
+            rules = NN.NETWORK.getRules()
+        newNetwork = NN.instantiateNN(trainingInputSet=trainingInputSet, rules=rules)
         newNetwork.trainModel()
         NN.setInstance(newNetwork)
 
     @staticmethod
-    def resetNetwork():
+    def resetNetwork(trainingInputSet=None):
         """ Creates a new class instance for the network
         """
         NN.NETWORK = None
@@ -77,7 +73,7 @@ class NN(object):
         self.setTrainingInputSet(nnTrainingInputSet)
         self.trainModel()
 
-    def trainWithRealData(self):
+    def trainWithCatalog(self):
         pass
 
     def createModel(self):
@@ -90,9 +86,11 @@ class NN(object):
         self._model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy']) #Adam = efficient gradient descent
         NN.RLOCK.release()
 
-    def trainModel(self, nb_epoch=NN_DEFAULT_EPOCHS, batch_size=NN_DEFAULT_BATCH_SIZE):
+    def trainModel(self, epochs=NN_DEFAULT_EPOCHS, batch_size=NN_DEFAULT_BATCH_SIZE):
         NN.RLOCK.acquire()
-        self._model.fit(self.getTrainingInput(), self.getTrainingOutput(), nb_epoch=nb_epoch, batch_size=batch_size)
+        nInput = self.getTrainingInput()
+        nOutput = self.getTrainingOutput()
+        self._model.fit(nInput, nOutput, epochs=epochs, batch_size=batch_size)
         NN.RLOCK.release()
 
     def evaluate(self, nn_input, nn_output):
@@ -136,6 +134,10 @@ class NN(object):
             return None
         return self._traningInputSet._rule_dic[(nationality, category)]
 
-    def __init__(self, trainingInputSet = None):
+    def getRules(self):
+        return self._rules
+
+    def __init__(self, trainingInputSet=None, rules=None):
         self._model = None
-        self._traningInputSet = NNTrainingInputSet()
+        self._traningInputSet = trainingInputSet
+        self._rules = rules

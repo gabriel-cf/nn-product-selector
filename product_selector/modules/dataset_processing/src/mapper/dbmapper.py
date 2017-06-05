@@ -1,11 +1,13 @@
 import logging
 from datetime import datetime
 from ..io.mongoconnector.mongohandler import MongoHandler
+from .mapper import Mapper
 from ..model.user import User
 from ..model.product import Product
 from ..model.mappeduser import MappedUser
 from ..model.mappedproduct import MappedProduct
 from ..model.rating import Rating
+from ..model.scenario.rule import Rule
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -24,7 +26,7 @@ class DBMapper(object):
         nationality = dbUser['nat']
         # Transform string date to date object
         dateOfBirth = datetime.strptime(dateOfBirth.split(' ')[0], '%Y-%m-%d')
-        logger.debug("Mapped user: %s;%s;%d;%s", username, gender, dateOfBirth.year, nationality)
+        #logger.debug("Mapped user: %s;%s;%d;%s", username, gender, dateOfBirth.year, nationality)
         user = User(username, gender, dateOfBirth, nationality)
 
         return user
@@ -49,7 +51,7 @@ class DBMapper(object):
         imageUrl = dbProduct['image_url']
         if (categories):
             product = Product(idP, name, categories, imageUrl)
-            logger.debug("Mapped product: prod_id:%s", idP)
+            #logger.debug("Mapped product: prod_id:%s", idP)
 
         return product
 
@@ -74,8 +76,15 @@ class DBMapper(object):
         user = DBMapper.fromDBResultToMappedUser(dbUser)
         product = DBMapper.fromDBResultToMappedProduct(dbProduct)
         if (not user is None and not product is None):
-            rating = Rating(ratingValue, user, product)
-            logger.debug("Mapped rating: ratingValue:%d, username:%s, productId:%s",\
-                         ratingValue, username, productId)
+            rating = Rating(user, product, ratingValue)
 
         return rating
+
+    @staticmethod
+    def fromDBResultToRuleDictionary(dbRules):
+        ruleDic = dict()
+        for dbRule in dbRules:
+            ruleDic[(Mapper.getNationalityValue(dbRule['_nationality']),\
+                    Mapper.getCategoryValue(dbRule['_category']))]\
+            = Rule(dbRule['_w_age'], dbRule['_w_male'], dbRule['_w_female'], dbRule['_w_avg_rating'], dbRule['_older_better'])
+        return ruleDic

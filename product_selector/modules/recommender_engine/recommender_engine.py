@@ -1,6 +1,8 @@
+import time
 import logging
 from ..dataset_processing.src.io.mongoconnector.mongohandler import MongoHandler
 from ..dataset_processing.src.mapper.dbmapper import DBMapper
+from ..dataset_processing.src.mapper.mapper import Mapper
 from ..keras_learning.nn import NN
 from ..keras_learning.io.nninput import NNInput
 from ..keras_learning.io.nnoutput import NNOutput
@@ -17,27 +19,44 @@ class RecommenderEngine(object):
        of recommended categories with recommended products.
     """
 
+    PRODUCT_CATEGORIES = Mapper.getAllAvailableCategories()
+
     @staticmethod
-    def _translate(self, arg):
-        pass
+    def _getUserFromDB(dbUser):
+        mUser = DBMapper.fromDBResultToMappedUser(dbUser)
+        if mUser is None:
+            logging.warn("Could not map user %s" % mUser)
+        return mUser
 
     @staticmethod
     def _processCatalog(dbUser):
         """Returns generator of n NNInputSet of size {MAX_NN_INPUT_SIZE} values for a given user"""
         mUser = DBMapper.fromDBResultToMappedUser(dbUser)
         if mUser is None:
-            logging.warn("User %s not found" % mUser)
+            logging.warn("Could not map user %s" % mUser)
             return
         productCursor = MongoHandler.getInstance().getAllProducts()
         exhausted = False
         while not exhausted:
-            nnInputSet = DBToNNInputProcesor.generateNNInputSet(mUser, productCursor)
+            nnInputSet = DBToNNInputProcesor.generateIncrementalNNInputSet(mUser, productCursor)
             exhausted = nnInputSet.isEmpty()
             if not exhausted:
                 yield nnInputSet
 
     @staticmethod
-    def getRecommendationsForUser(username):
+    def _processCatalogByCategories(dbUser):
+        mUser = DBMapper.fromDBResultToMappedUser(dbUser)
+        if mUser is None:
+            logging.warn("Could not map user %s" % mUser)
+            return
+        for category in RecommenderEngine.PRODUCT_CATEGORIES:
+            productCursor = MongoHandler.getInstance().getProductsByParameters(category=category)
+            nnInputSet = DBToNNInputProcesor.generateSingleNNInputSet(mUser, productCursor)
+            yield nnInputSet
+
+    @staticmethod
+    def getCategoriesForUser(username):
+        ini = time.time()
         dbUser = MongoHandler.getInstance()\
                              .getUsersByParameters(one_only=True,
                                                    username=username)
@@ -45,8 +64,12 @@ class RecommenderEngine(object):
             logger.warning("No users were found for username '%s'" % username)
             return None
         nn = NN.getInstance()
-        for nnInputSet in RecommenderEngine._processCatalog(dbUser):
-            prediction = nn.predict(nnInputSet.getValues())
+        for nnInputSet in RecommenderEngine._processCatalogByCategories(dbUser):
+            prediction = nn.predict(nnInputSet.getNNValues())
             prediction = NNOutput.translatePredictionListToDecimalList(prediction)
-            print(prediction)
+            products = nnInputSet.getMappedProducts()
+            productPredictionList = zip(products, prediction)
+            print(productPredictionList)
+        fini = time.time()
         print("Woao! we made it!")
+        print(fini - ini)

@@ -8,10 +8,10 @@ logger = logging.getLogger(__name__)
 class NNOutputSet(object):
     """"""
     def add(self, ratingValue):
-        nn_output = NNOutput.getNNOutput(ratingValue, only_entry=True)
+        nn_output = NNOutput.getNNValues(ratingValue, only_entry=True)
         self._values.append(nn_output)
 
-    def getValues(self):
+    def getNNValues(self):
         if self._converted:
             return self._values
         return np.array(self._values)

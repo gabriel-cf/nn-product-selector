@@ -15,7 +15,16 @@ class DBToNNInputProcesor(object):
     MAX_NN_INPUT_SET_SIZE = SettingsLoader.getValue("MAX_NN_INPUT_SIZE")
 
     @staticmethod
-    def generateNNInputSet(mUser, productCursor, maxSize=MAX_NN_INPUT_SET_SIZE):
+    def generateSingleNNInputSet(mUser, productCursor):
+        nnInputSet = NNInputSet()
+        for dbProduct in productCursor:
+            mProduct = DBMapper.fromDBResultToMappedProduct(dbProduct)
+            nnInputSet.add(mUser, mProduct)
+        return nnInputSet
+
+    @staticmethod
+    def generateIncrementalNNInputSet(mUser, productCursor, maxSize=MAX_NN_INPUT_SET_SIZE):
+        """Used when the hardware limitations don't allow to hold in memory a whole NNInputSet"""
         nnInputSet = NNInputSet()
         sentinel = object() # Guard for exhausted generator
         for i in range(0, maxSize):

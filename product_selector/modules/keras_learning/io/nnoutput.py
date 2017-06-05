@@ -14,7 +14,7 @@ class NNOutput(object):
 	MAX_VALUE = 5.0
 
 	@staticmethod
-	def getNNOutput(outputValue, only_entry=False):
+	def getNNValues(outputValue, only_entry=False):
 		""" outputValue --> decimal value within [0, NNOutput.MAX_VALUE]
 			returns --> numpy matrix where each row is an expected output
 		"""
@@ -44,4 +44,4 @@ class NNOutput(object):
 		return np.array([x[0] for x in nnOutputValue_l])
 
 	def __init__(self, outputValue):
-		self._value = NNOutput.getNNOutput(outputValue)
+		self._value = NNOutput.getNNValues(outputValue)

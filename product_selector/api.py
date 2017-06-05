@@ -31,7 +31,7 @@ def getRecommendationsByCategory(m_user, max_results=5):
             continue
         combinations = itertools.product([m_user], CACHED_M_PRODUCT_DIC[category])
         recommendations = []
-        inputSet = NNInput.getNNInputList(combinations)
+        inputSet = NNInput.getNNValuesList(combinations)
         logger.info('Getting predictions')
         predictions = NNOutput.translatePredictionListToDecimalList(NN.predict(inputSet))
         # Get the indexes of the highest values
@@ -55,10 +55,10 @@ def getRecommendationsByCategory(m_user, max_results=5):
     return category_recommendations
 
 def getRecommendationResponseJSON(username):
-    """    Receives a dictionary with the recommended categories and products
+    """ Receives a dictionary with the recommended categories and products
         and generates the JSON
     """
-    recommendations = RecommenderEngine.getRecommendationsForUser(username)
+    category_l = RecommenderEngine.getCategoriesForUser(username)
     #user_db = MongoHandler.getInstance().getUsersByParameters(one_only=True, username=username)
     #if (user_db is None):
     #    logger.warning("No users were found for username '%s'" % username)
@@ -68,7 +68,7 @@ def getRecommendationResponseJSON(username):
     #category_l = []
     #for category_name in category_recommendations:
     #    category_l.append(Category(category_name, category_recommendations[category_name]))
-    #recommendation = Recommendation(category_l)
+    recommendation = Recommendation(category_l)
     return None
     json_o = RecommendationResponse.getJSON(recommendation)
     logger.debug(json_o)
@@ -76,16 +76,16 @@ def getRecommendationResponseJSON(username):
     return json_o
 
 NN = Loader.loadNN()
+
 #CACHED_USER_DIC, CACHED_M_USER_DIC = Loader.loadUsers() # By Nationalities
 #CACHED_PRODUCT_DIC, CACHED_M_PRODUCT_DIC = Loader.loadProducts(analytics=False) # By Categories
 #loadProductsJob = (Loader.loadProducts, 3)
 ReloadNNJob = (Loader.reloadNN, 24)
-scheduler = Scheduler([ReloadNNJob])
-scheduler.start()
+#scheduler = Scheduler([ReloadNNJob])
+#scheduler.start()
 #CACHED_RATING_DIC, CACHED_M_RATING_DIC = Loader.loadRatings() # By Categories
 #CACHED_SALES_DIC, CACHED_M_SALES_DIC = Loader.loadSales() # By Categories
 
 if __name__ == '__main__':
     # Test
-    user = CACHED_USER_DIC['ES'][0]
-    json_s = getRecommendationResponseJSON(user._username)
+    print('I am here')
