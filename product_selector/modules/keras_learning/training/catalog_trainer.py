@@ -23,11 +23,19 @@ class CatalogTrainer(object):
         if updateRules:
             rules = getRules()
         i = 0
+        ratingTest = None
         for dbRating in ratingCursor:
             rating = DBMapper.fromDBResultToRating(dbRating)
             if rating:
                 trainingInputSet.addRatingToTrainingInput(rating)
                 i += 1
+                if i %500 == 0:
+                    ratingTest = rating
+                    break
                 if i % 1000 == 0:
-                    print(i)
+                    logger.info("Processed %d ratings" % i)
+        logger.info("%d ratings will be used as training data" % i)
         NN.trainNewInstance(trainingInputSet=trainingInputSet, rules=rules)
+        #prediction = NN.getInstance().predict(trainingInputSet.getInput())
+        #realRating = trainingInputSet.getOutput()
+        #print(prediction - realRating)

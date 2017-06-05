@@ -42,6 +42,3 @@ class NNInput(object):
 		for user, product in mapped_user_product_tuple_list:
 			t_X.append(NNInput.getNNValues(user, product, only_entry=True))
 		return np.array(t_X)
-
-	def __init__(self, mapped_user, mapped_product):
-		self._value = NNInput.getNNValues(mapped_user, mapped_product)

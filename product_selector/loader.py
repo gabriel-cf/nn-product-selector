@@ -1,4 +1,5 @@
 from .modules.keras_learning.training.catalog_trainer import CatalogTrainer
+from .modules.task_scheduler.scheduler import Scheduler
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -13,4 +14,7 @@ class Loader(object):
     """
     # Train the NN and load the rules from DB
     CatalogTrainer.trainNN(updateRules=True)
-    
+    scheduler = Scheduler()
+    scheduler.scheduleUpdateRates()
+    scheduler.scheduleUpdateNN()
+    scheduler.start()
