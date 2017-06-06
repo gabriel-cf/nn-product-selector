@@ -7,9 +7,7 @@ from ..dataset_processing.src.mapper.mapper import Mapper
 from ..dataset_processing.src.model.rating import Rating
 from ..dataset_processing.src.model.category import Category
 from ..keras_learning.nn import NN
-from ..keras_learning.io.nninput import NNInput
 from ..keras_learning.io.nnoutput import NNOutput
-from .categoryset import CategorySet
 from .db_to_nn_input_processor import DBToNNInputProcesor
 
 logging.basicConfig(level=logging.DEBUG)
@@ -45,13 +43,6 @@ class RecommenderEngine(object):
         return mUser
 
     @staticmethod
-    def _processCatalog(mUser):
-        """Returns generator of n NNInputSet of size {MAX_NN_INPUT_SIZE} values for a given user"""
-        productCursor = MongoHandler.getInstance().getAllProducts()
-        nnInputGenerator = DBToNNInputProcesor.getNNInputGenerator(mUser, productCursor)
-        return nnInputGenerator
-
-    @staticmethod
     def _processCatalogByCategories(mUser):
         for category in RecommenderEngine.PRODUCT_CATEGORIES:
             productCursor = MongoHandler.getInstance().getProductsByParameters(category=category)
@@ -68,19 +59,6 @@ class RecommenderEngine(object):
             expectedRating = Rating(mUser, mProducts[i], predictions[i])
             category_l.append(expectedRating)
         return category_l
-
-    @staticmethod
-    def getBestSelectionsForUser(username, max_results=10):
-        mUser = RecommenderEngine._getMappedUserFromUsername(username)
-        if not mUser:
-            return
-        nn = NN.getInstance()
-        nnInputSet = RecommenderEngine._processCatalog(mUser)
-        predictions = nn.predict(nnInputSet.getNNValues())
-        predictions = NNOutput.translatePredictionListToDecimalList(predictions)
-        mProducts = nnInputSet.getMappedProducts()
-        bestSelections = RecommenderEngine._getPredictedCategory(mUser, mProducts, predictions, max_results)
-        return bestSelections
 
     @staticmethod
     def _selectBestCategories(category_predictions_dict, max_categories=3):
