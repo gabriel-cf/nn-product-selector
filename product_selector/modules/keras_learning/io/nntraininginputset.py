@@ -9,11 +9,11 @@ logger = logging.getLogger(__name__)
 
 class NNTrainingInputSet(object):
     """docstring for NNTrainingInput"""
-    def addRatingToTrainingInput(self, rating):
+    def addRatingToTrainingInput(self, rating, valueOnly=False):
         mappedUser = rating.getMappedUser()
         mappedProduct = rating.getMappedProduct()
         ratingValue = rating.getRating()
-        self._nninputset.add(mappedUser, mappedProduct)
+        self._nninputset.add(mappedUser, mappedProduct, valueOnly=valueOnly)
         self._nnoutputset.add(ratingValue)
 
     def getInput(self):

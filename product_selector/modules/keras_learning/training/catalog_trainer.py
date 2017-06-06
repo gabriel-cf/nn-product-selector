@@ -1,9 +1,9 @@
 import logging
 from ...dataset_processing.src.io.mongoconnector.mongohandler import MongoHandler
 from ...dataset_processing.src.mapper.dbmapper import DBMapper
-from ...recommender_engine.db_to_nn_input_processor import DBToNNInputProcesor
 from ..io.nntraininginputset import NNTrainingInputSet
 from ..nn import NN
+from ...settings_loader import SettingsLoader
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -17,7 +17,8 @@ class CatalogTrainer(object):
     """"""
     @staticmethod
     def trainNN(updateRules=False):
-        ratingCursor = MongoHandler.getInstance().getAllRatings()
+        maxDays = SettingsLoader.getValue('MAX_DAYS_RATING')
+        ratingCursor = MongoHandler.getInstance().getAllRatings(maxDays=maxDays)
         trainingInputSet = NNTrainingInputSet()
         rules = None
         if updateRules:
@@ -26,14 +27,9 @@ class CatalogTrainer(object):
         for dbRating in ratingCursor:
             rating = DBMapper.fromDBResultToRating(dbRating)
             if rating:
-                trainingInputSet.addRatingToTrainingInput(rating)
+                trainingInputSet.addRatingToTrainingInput(rating, valueOnly=True)
                 if i % 1000 == 0:
                     logger.info("Processed %d ratings" % i)
                 i += 1
-                if i % 20000 == 0:
-                    break
         logger.info("%d ratings will be used as training data" % i)
         NN.trainNewInstance(trainingInputSet=trainingInputSet, rules=rules)
-        #prediction = NN.getInstance().predict(trainingInputSet.getInput())
-        #realRating = trainingInputSet.getOutput()
-        #print(prediction - realRating)

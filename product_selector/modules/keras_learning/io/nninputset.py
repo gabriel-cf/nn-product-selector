@@ -11,11 +11,12 @@ logger = logging.getLogger(__name__)
 
 class NNInputSet(object):
     """"""
-    def add(self, mappedUser, mappedProduct):
+    def add(self, mappedUser, mappedProduct, valueOnly=False):
         nn_input = NNInput.getNNValues(mappedUser, mappedProduct, only_entry=True)
         self._input.append(nn_input) # Concatenate in the original input list
-        self._mappedUsers.append(mappedUser)
-        self._mappedProducts.append(mappedProduct)
+        if not valueOnly:
+            self._mappedUsers.append(mappedUser)
+            self._mappedProducts.append(mappedProduct)
 
     def getNNValues(self):
         if self._converted:

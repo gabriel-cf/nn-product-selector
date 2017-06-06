@@ -1,7 +1,6 @@
-#!/usr/bin/python2.7
-from pymongo import MongoClient
-
+import time
 import logging
+from pymongo import MongoClient
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
@@ -40,14 +39,17 @@ class MongoHandler(object):
     def getAllProducts(self):
         """ Returns all products on the DB"""
         return self._productDB.products_collection.find()
-    def getAllRatings(self, sort=False, maxDate=None):
+    def getAllRatings(self, sort=False, maxDays=None):
         res = None
         collection = self._analysisDB.ratings_collection if not MongoHandler.MOCK_ANALYTICS\
          else self._analysisDB.ratings_collection_mock
-            #if maxDate: TODO
-            #    res = collection.find({"_date": {'$lt': maxDate}})
-            #else:
-        res = collection.find()
+        if maxDays:
+            maxDaysinMiliSeconds = time.time() - (maxDays * 24 * 3600)
+            logger.info("Found %d ratings for the last %d days"\
+                        % (collection.count({"_date": {'$gt': maxDaysinMiliSeconds}}), maxDays))
+            res = collection.find({"_date": {'$gt': maxDaysinMiliSeconds}})
+        else:
+            res = collection.find()
         if sort:
             return res.sort({"_date": -1})
         return res

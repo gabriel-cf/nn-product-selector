@@ -14,8 +14,8 @@ class NN(object):
 
     NN_INPUTS = 5 # {user_nationality_mapped, user_sex_mapped, user_age, product_category_mapped, product_avg_rating}
     NN_OUTPUTS = 1 # {like_probability}
-    NN_DEFAULT_EPOCHS = 20
-    NN_DEFAULT_BATCH_SIZE = 500
+    NN_DEFAULT_EPOCHS = 100
+    NN_DEFAULT_BATCH_SIZE = 250
     NETWORK = None # Neural Network built upon a Keras model
     RLOCK = RLock()
 
