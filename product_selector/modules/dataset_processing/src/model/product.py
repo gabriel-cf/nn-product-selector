@@ -18,13 +18,15 @@ class Product(object):
 		return self._mainCategory
 
 	def hasCategory(self):
-		return not self._mainCategory is None
+		return not self._mainCategory is None and not self._mainCategory == 'None'
 
-	def __init__(self, prodID, name, categories, imageURL, avgRating = 0.0):
+	def getId(self):
+		return self._id
+
+	def __init__(self, prodID, name, mainCategory, imageURL, avgRating = 0.0):
 		self._id = prodID
 		self._name = name
-		self._categories = categories
-		self._mainCategory = categories[0]
+		self._mainCategory = mainCategory
 		self._avgRating = avgRating
 		self._noRatings = 0
 		self._imageURL = imageURL

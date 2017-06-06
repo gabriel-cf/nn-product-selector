@@ -17,6 +17,9 @@ if __name__ == '__main__':
     print(handler._analysisDB.ratings_collection_mock.find().count())
     print("#########################################################")
     print("#########################################################")
+    print(handler._analysisDB.predictions_collection.find_one())
+    print("#########################################################")
+    print("#########################################################")
     pipeline = [
         {"$group":
             {
@@ -53,6 +56,5 @@ if __name__ == '__main__':
     #product.setRating([db_rating['_rating'] for db_rating in db_ratings])
     #fini = time.time()
     #print(fini - ini)
-    print productBefore['rate']
     print(handler._productDB.products_collection.find_one())
     print(handler._productDB.products_collection.find_one()['rate'])

@@ -8,12 +8,24 @@ from ..model.mappeduser import MappedUser
 from ..model.mappedproduct import MappedProduct
 from ..model.rating import Rating
 from ..model.scenario.rule import Rule
+from ..model.category import Category
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 class DBMapper(object):
     """Static class that maps a user from the MongoDB into a processable user"""
+
+    @staticmethod
+    def hasCategory(dbProduct, category):
+        categories = dbProduct['sections']
+        mainCategory = None
+        if categories and len(categories) > 0:
+            mainCategory = categories[0]
+        if not mainCategory:
+            return False
+        hasCategory = category == mainCategory
+        return hasCategory
 
     @staticmethod
     def fromDBResultToUser(dbUser):
@@ -47,11 +59,10 @@ class DBMapper(object):
         product = None
         idP = dbProduct['_id']
         name = dbProduct['name']
-        categories = dbProduct['sections']
+        mainCategory = dbProduct['mainCategory']
         imageUrl = dbProduct['image_url']
-        if (categories):
-            product = Product(idP, name, categories, imageUrl)
-            #logger.debug("Mapped product: prod_id:%s", idP)
+        avgRating = dbProduct['rate']
+        product = Product(idP, name, mainCategory, imageUrl, avgRating=avgRating)
 
         return product
 
@@ -88,3 +99,21 @@ class DBMapper(object):
                     Mapper.getCategoryValue(dbRule['_category']))]\
             = Rule(dbRule['_w_age'], dbRule['_w_male'], dbRule['_w_female'], dbRule['_w_avg_rating'], dbRule['_older_better'])
         return ruleDic
+
+    @staticmethod
+    def fromDBResultToPrediction(dbPrediction):
+        prediction_dic = dbPrediction['_predictions']
+        category_l = []
+        for category in prediction_dic:
+            for categoryName in category:
+                print(categoryName)
+                product_ids = category[categoryName]
+                products = []
+                for prodId in product_ids:
+                    dbProduct = MongoHandler.getInstance().getProductsByParameters(one_only=True, id=prodId)
+                    if dbProduct:
+                        products.append(DBMapper.fromDBResultToProduct(dbProduct))
+                    else:
+                        logging.warn("Could not retrieve product from id %s" %prodId)
+                category_l.append(Category(categoryName, products))
+        return category_l

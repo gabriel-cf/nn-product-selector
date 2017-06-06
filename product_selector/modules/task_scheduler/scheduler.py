@@ -6,6 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.executors.pool import ThreadPoolExecutor
 from .jobs.db_update_rates import DBUpdateRates
 from .jobs.nn_update_network import NNUpdateNetwork
+from .jobs.db_update_predictions import DBUpdatePredictions
 from ..settings_loader import SettingsLoader
 
 logging.basicConfig(level=logging.DEBUG)
@@ -26,6 +27,9 @@ class Scheduler(object):
         self._scheduler.add_job(job, 'interval', hours=hours, coalesce=True,
                                 misfire_grace_time=Scheduler.MISFIRE_GRACE_TIME)
 
+    def addJobToRunImmediately(self, job):
+        self._scheduler.add_job(job)
+
     def scheduleUpdateRates(self):
         hours = SettingsLoader.getValue('REFRESH_RATES_H_FREQUENCY')
         self.addJob(DBUpdateRates.job, hours)
@@ -33,6 +37,13 @@ class Scheduler(object):
     def scheduleUpdateNN(self):
         hours = SettingsLoader.getValue('REFRESH_NN_H_FREQUENCY')
         self.addJob(NNUpdateNetwork.job, hours)
+
+    def scheduleUpdatePredictions(self, immediate=False):
+        if not immediate:
+            hours = SettingsLoader.getValue('REFRESH_PREDICTIONS_H_FREQUENCY')
+            self.addJob(DBUpdatePredictions.job, hours)
+        else:
+            self.addJobToRunImmediately(DBUpdatePredictions.job)
 
     def start(self):
         self._scheduler.start()

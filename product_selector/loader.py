@@ -1,5 +1,7 @@
 from .modules.keras_learning.training.catalog_trainer import CatalogTrainer
 from .modules.task_scheduler.scheduler import Scheduler
+from .modules.recommender_engine.recommender_engine import RecommenderEngine
+from .modules.dataset_processing.src.io.mongoconnector.mongohandler import MongoHandler
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -17,4 +19,6 @@ class Loader(object):
     scheduler = Scheduler()
     scheduler.scheduleUpdateRates()
     scheduler.scheduleUpdateNN()
+    scheduler.scheduleUpdatePredictions(immediate=True) # To run when startup
+    scheduler.scheduleUpdatePredictions(immediate=False) # To run periodically in the future
     scheduler.start()

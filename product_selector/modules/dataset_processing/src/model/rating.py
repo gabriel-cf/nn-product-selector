@@ -13,3 +13,12 @@ class Rating(object):
 
     def getMappedProduct(self):
         return self._mProduct
+
+    def __lt__(self, other):
+         return self._ratingValue < other._ratingValue
+
+    def __eq__(self, other):
+        return self._ratingValue == other._ratingValue
+
+    def __repr__(self):
+	    return "category:%s ; rating:%f" % (self._mProduct._mainCategory, self._ratingValue)

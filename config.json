@@ -4,5 +4,8 @@
   "NATIONALITY_MAPPER_FILE":"dataset_processing/config/mapper/nationality_mapper.json",
   "CATEGORY_MAPPER_FILE":"dataset_processing/config/mapper/category_mapper.json",
   "MAX_CATEGORIES":3,
-  "MAX_PRODUCTS_PER_CATEGORY":10
+  "MAX_PRODUCTS_PER_CATEGORY":10,
+  "REFRESH_RATES_H_FREQUENCY":3,
+  "REFRESH_NN_H_FREQUENCY":24,
+  "MAX_NN_INPUT_SIZE":100000
 }

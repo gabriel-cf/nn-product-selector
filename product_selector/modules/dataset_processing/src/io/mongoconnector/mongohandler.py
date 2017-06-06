@@ -19,7 +19,7 @@ class MongoHandler(object):
     Q_USER_NATIONALITY = 'nat'
     Q_USER_SEX = 'gender'
     Q_USER_USERNAME = 'login.username'
-    Q_PRODUCT_CATEGORY = 'sections'
+    Q_PRODUCT_CATEGORY = 'mainCategory'
     Q_PRODUCT_ID = '_id'
     KWARG_NATIONALITY = 'nationality'
     KWARG_SEX = 'sex'
@@ -39,7 +39,7 @@ class MongoHandler(object):
         return self._userDB.users_collection.find()
     def getAllProducts(self):
         """ Returns all products on the DB"""
-        return self._productDB.products_collection.find().limit(1000)
+        return self._productDB.products_collection.find()
     def getAllRatings(self, sort=False, maxDate=None):
         res = None
         collection = self._analysisDB.ratings_collection if not MongoHandler.MOCK_ANALYTICS\
@@ -102,6 +102,9 @@ class MongoHandler(object):
 
     def getProductById(self, productId):
         return self._productDB.products_collection.find_one({'_id': productId})
+
+    def getPredictionByUserId(self, userId):
+        return self._analysisDB.predictions_collection.find_one({'_userId': userId})
 
     def __init__(self):
         logging.info("Attempting connection with MongoDB service")
