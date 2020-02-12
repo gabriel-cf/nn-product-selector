@@ -2,7 +2,7 @@ APScheduler==3.3.1
 chardet==2.2.1
 colorama==0.2.5
 command-not-found==0.3
-Django==1.11.2
+Django==1.11.28
 django-cors-headers==2.1.0
 html5lib==0.999
 Keras==2.0.4
