@@ -4,7 +4,7 @@ colorama==0.2.5
 command-not-found==0.3
 Django==1.11.29
 django-cors-headers==2.1.0
-html5lib==0.999
+html5lib==0.999999999
 Keras==2.0.4
 language-selector==0.1
 numpy==1.12.1
